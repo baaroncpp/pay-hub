@@ -1,0 +1,60 @@
+
+buildscript {
+	repositories {
+		mavenLocal()
+		jcenter()
+	}
+	dependencies {
+		classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.8")
+	}
+}
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+}
+
+ext['serenityVersion']='2.3.8'
+
+
+
+apply plugin: 'net.serenity-bdd.aggregator'
+
+group = 'com.jajjamind'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.rest-assured:rest-assured:4.2.0'
+	testImplementation 'io.rest-assured:json-path:4.2.0'
+	testImplementation 'io.rest-assured:xml-path:4.2.0'
+
+	testImplementation project(':commons')
+
+	testCompile "net.serenity-bdd:serenity-core:${serenityVersion}"
+	testCompile "net.serenity-bdd:serenity-junit:${serenityVersion}"
+	testCompile('junit:junit:4.12')
+	testCompile('org.assertj:assertj-core:1.7.0')
+	testCompile('org.slf4j:slf4j-simple:1.7.7')
+
+
+}
+
+test {
+	useJUnitPlatform()
+}
+
+
+bootJar {
+	enabled = false
+}
+
+jar {
+	enabled = true
+}
