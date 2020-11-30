@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.config.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
 /**
  * @author akena
@@ -10,5 +11,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
  **/
 @Configuration
 @EnableResourceServer
-public class ResourceServerConfig {
+public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
 }

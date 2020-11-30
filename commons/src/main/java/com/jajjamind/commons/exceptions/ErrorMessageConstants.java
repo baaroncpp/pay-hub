@@ -12,4 +12,6 @@ public class ErrorMessageConstants {
     }
 
     public static String USER_NOT_FOUND = "User with username %s could not found";
+    public static String APP_CLIENT_NOT_FOUND = "App client with identifier %s could not found";
+    public static String APP_CLIENT_NOT_ENABLED = "App client with identifier %s has been disabled";
 }

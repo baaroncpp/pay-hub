@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.jpa.models.user;
 
 import com.jajjamind.payvault.core.jpa.models.BaseEntityLong;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,9 +22,10 @@ public class TUser extends BaseEntityLong {
     private boolean credentialExpired;
     private TUserAuthority userAuthority;
 
-    @Column(name = "username",unique = true)
+
+    @Column(name = "username")
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -66,7 +68,8 @@ public class TUser extends BaseEntityLong {
         this.credentialExpired = credentialExpired;
     }
 
-    @OneToOne(fetch = FetchType.EAGER,mappedBy = "user")
+    @JoinColumn(name = "username",referencedColumnName = "username",insertable = false,updatable = false)
+    @OneToOne(fetch = FetchType.LAZY)
     public TUserAuthority getUserAuthority() {
         return userAuthority;
     }

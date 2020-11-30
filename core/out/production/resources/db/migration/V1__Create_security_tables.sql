@@ -10,6 +10,7 @@ create table t_user(
 );
 
 create table t_authority (
+    id SERIAL PRIMARY KEY,
     username VARCHAR(20) REFERENCES t_user(username),
     authority VARCHAR(20)
 );
@@ -23,6 +24,7 @@ create table t_group (
 );
 
 create table t_group_authority (
+    id SERIAL PRIMARY KEY,
     group_id INTEGER NOT NULL,
     authority VARCHAR(20)
  );

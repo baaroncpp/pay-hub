@@ -6,13 +6,17 @@
 package com.jajjamind.commons.time;
 
 import com.jajjamind.commons.text.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 
 import java.text.*;
 import javax.xml.datatype.*;
 
 public abstract class DateTimeUtil {
-/*
+    private static final Logger  logger;
+
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String YYYY_MM_DD_00_00_00 = "yyyy-MM-dd 00:00:00";
     public static final String FORMAT_DEFAULT = "yyyyMMddHHmmssSSS";
@@ -70,24 +74,8 @@ public abstract class DateTimeUtil {
         	
         	return new java.sql.Date(d.getTime());
         }
+        
 
-
-
-    
-    public static String getCurrentUTCTime(final String format) {
-        final Date date = TLTimeInfoService.getUTCCalendar().getTime();
-        return localToUtcString(date, format);
-    }
-    
-    public static String localToUtcString(final Date date, final String format) {
-        if (null == date) {
-            return null;
-        }
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        final TLTimeFormatService tlTimeFormatService = new TLTimeFormatService(format);
-        return tlTimeFormatService.getUTCString(calendar);
-    }
 
     public static Date stringToDate(final String time, final String format) {
         if (StringUtil.isEmpty(time)) {
@@ -103,35 +91,9 @@ public abstract class DateTimeUtil {
             }
             date = df.parse(time);
         } catch (ParseException e) {
-            DateTimeUtil.log.error("parse [{}] to date with pattern [{}] failed.", time, format, e);
+            logger.error("parse [{}] to date with pattern [{}] failed.", time, format, e);
         }
         return date;
-    }
-
-      public static String utcToLocal(final String utcTime, final String format) {
-        if (StringUtil.isEmpty(utcTime)) {
-            return "";
-        }
-        if (utcTime.length() != format.length()) {
-            DateTimeUtil.log.error("parse [{}] to date with pattern [{}] failed. The length is mismatch.", utcTime, format);
-            return "";
-        }
-        Calendar calendar = null;
-        try {
-            final SimpleDateFormat sdf = new SimpleDateFormat(format);
-            final Date date = sdf.parse(utcTime);
-            calendar = Calendar.getInstance();
-            calendar.setTime(date);
-        }
-        catch (ParseException e) {
-            DateTimeUtil.log.error("parse [{}] to date with pattern [{}] failed.", utcTime, format, e);
-            return "";
-        }
-        final Calendar utcCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        utcCal.set(calendar.get(1), calendar.get(2), calendar.get(5), calendar.get(11), calendar.get(12), calendar.get(13));
-        final Calendar localCal = TLTimeConvertService.UTC2LocalTime(utcCal);
-        final TLTimeFormatService formatService = new TLTimeFormatService(format);
-        return formatService.getLocalString(localCal);
     }
 
     private static String dateToString(final Date date, final String format, final String timeZoneID) {
@@ -152,7 +114,7 @@ public abstract class DateTimeUtil {
             return "";
         }
         if (localDateStr.length() != format.length()) {
-            DateTimeUtil.log.error("parse [{}] to date with pattern [{}] failed. The length is mismatch.", localDateStr, format);
+            logger.error("parse [{}] to date with pattern [{}] failed. The length is mismatch.", localDateStr, format);
             return "";
         }
         try {
@@ -168,7 +130,7 @@ public abstract class DateTimeUtil {
                 utcTimeStr = formatter.format(localDate);
             }
         } catch (ParseException e) {
-            DateTimeUtil.log.error("parse date error", e);
+            logger.error("parse date error", e);
         }
         return utcTimeStr;
     }
@@ -178,7 +140,7 @@ public abstract class DateTimeUtil {
             return "";
         }
         if (utcTimeStr.length() != format.length()) {
-            DateTimeUtil.log.error("parse [{}] to date with pattern [{}] failed. The length is mismatch.", utcTimeStr, format);
+            logger.error("parse [{}] to date with pattern [{}] failed. The length is mismatch.", utcTimeStr, format);
             return "";
         }
         Date utcDate = null;
@@ -197,7 +159,7 @@ public abstract class DateTimeUtil {
                 localDateStr = formatter.format(utcDate);
             }
         } catch (ParseException e) {
-            DateTimeUtil.log.error("parse date error", e);
+            logger.error("parse date error", e);
         }
         return localDateStr;
     }
@@ -279,7 +241,7 @@ public abstract class DateTimeUtil {
 
     static {
         UTC_TIMEZONE = TimeZone.getTimeZone("UTC");
-        //   DateTimeUtil.log = LogFactory.getDebugLog();
+        logger = LogManager.getLogger();
     }
-    */
+    
 }

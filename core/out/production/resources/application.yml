@@ -15,8 +15,10 @@ spring:
           hikari.max-lifetime: 1800000
           hikari.idle-timeout: 30000
    jpa:
+     show-sql: true
      hibernate:
        ddl-auto: none
+
 
    flyway:
       schemas: core
@@ -26,3 +28,20 @@ spring:
 
 payvault:
     enviroment: ${PV_ENV}
+
+
+jwt:
+  key: 8484iriir
+  certificate:
+    password: uU488495!@#@360
+    alias: test
+    private-key: test.jks
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        key-uri: http://localhost:9005/oauth/token_key
+    client:
+      client-id: client # Configure resource server independently as an app
+      client-secret: secret

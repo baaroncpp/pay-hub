@@ -1,6 +1,9 @@
 package com.jajjamind.payvault.core.jpa.models.user;
 
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author akena
@@ -9,25 +12,24 @@ import javax.persistence.*;
  **/
 @Entity
 @Table(name = "t_authority",schema = "core")
-public class TUserAuthority {
+public class TUserAuthority implements Serializable {
 
     private Integer id;
-    private TUser user;
+    private String username;
     private String authority;
 
-    @JoinColumn(name = "username")
-    @OneToOne(fetch = FetchType.LAZY)
-    public TUser getUser() {
-        return user;
+    @NaturalId
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser(TUser user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Column(name = "authority")
     public String getAuthority() {
-        return authority;
+        return this.authority;
     }
 
     public void setAuthority(String authority) {
@@ -35,6 +37,7 @@ public class TUserAuthority {
     }
 
     @Id
+    @GeneratedValue
     public Integer getId() {
         return id;
     }

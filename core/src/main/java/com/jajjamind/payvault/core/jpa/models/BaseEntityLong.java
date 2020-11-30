@@ -27,7 +27,7 @@ public class BaseEntityLong {
         this.id = id;
     }
 
-    @Column(name = "created_on")
+    @Column(name = "created_on",insertable =false, updatable = false)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getCreatedOn() {
         return createdOn;

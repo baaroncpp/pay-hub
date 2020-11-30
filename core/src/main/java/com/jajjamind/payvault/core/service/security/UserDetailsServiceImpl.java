@@ -1,17 +1,22 @@
 package com.jajjamind.payvault.core.service.security;
 
 import com.jajjamind.commons.exceptions.ErrorMessageConstants;
+import com.jajjamind.commons.utils.SetUtils;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.repository.security.UserRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author akena
@@ -38,11 +43,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         LoggedInUser loggedInUser = new LoggedInUser();
         loggedInUser.setAccountNonExpired(!tUser.isAccountExpired());
         loggedInUser.setAccountNonLocked(!tUser.isAccountLocked());
-        loggedInUser.setCredentialExpired(tUser.isCredentialExpired());
+        loggedInUser.setCredentialExpired(!tUser.isCredentialExpired());
         loggedInUser.setEnabled(Boolean.TRUE);
         loggedInUser.setId(tUser.getId());
         loggedInUser.setPassword(tUser.getPassword());
         loggedInUser.setUsername(tUser.getUsername());
+        loggedInUser.setAuthorities(AuthorityUtils.commaSeparatedStringToAuthorityList(tUser.getUserAuthority().getAuthority()));
 
         return loggedInUser;
 
