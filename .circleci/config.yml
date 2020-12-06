@@ -7,12 +7,16 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11-jdk
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+      - image: circleci/postgres:9.6.7
+        environment:
+          POSTGRES_DB: payvault
+          POSTGRES_USER: payvault
+          POSTGRES_PASSWORD: ?1234#23
 
     working_directory: ~/repo
 
@@ -23,6 +27,17 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run: sudo apt update && sudo apt install postgresql-client
+      - run:
+          name: Create initial schemas
+          command: |
+                    echo ?1234#23 > .pgpass && psql -h localhost -U payvault -p 5432 \
+                    -c "CREATE SCHEMA core;"
 
       # Download and cache dependencies
       - restore_cache:
@@ -39,4 +54,20 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle test
+      - run:
+          name: Test commons
+          command: ./gradlew commons:test
+      - run:
+          name: Test core
+          command: ./gradlew core:test
+      - run:
+          name: Run serenity BDD
+          command: ./gradlew core:bootRun
+          background: true
+      - run:
+          name: Wait for app
+          command: dockerize -wait tcp://localhost:9005 -timeout 1m
+      - run:
+          name: Run serenity test
+          command: ./gradlew serenity-tests:test
+

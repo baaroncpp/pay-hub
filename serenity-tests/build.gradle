@@ -46,8 +46,12 @@ dependencies {
 
 }
 
+
 test {
-	useJUnitPlatform()
+	testLogging.events("passed","failed","skipped")
+	test.failFast(false)
+	testLogging.showExceptions(true)
+	testLogging.showCauses(true)
 }
 
 
@@ -58,3 +62,6 @@ bootJar {
 jar {
 	enabled = true
 }
+
+gradle.startParameter.continueOnFailure = true
+test.finalizedBy(aggregate)
