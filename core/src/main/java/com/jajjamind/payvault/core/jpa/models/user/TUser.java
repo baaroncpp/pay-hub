@@ -21,6 +21,7 @@ public class TUser extends BaseEntityLong {
     private boolean accountExpired;
     private boolean credentialExpired;
     private TUserAuthority userAuthority;
+    private TUserMeta userMeta;
 
 
     @Column(name = "username")
@@ -76,5 +77,15 @@ public class TUser extends BaseEntityLong {
 
     public void setUserAuthority(TUserAuthority userAuthority) {
         this.userAuthority = userAuthority;
+    }
+
+    @JoinColumn(name = "id",referencedColumnName = "user_id",insertable = false,updatable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    public TUserMeta getUserMeta() {
+        return userMeta;
+    }
+
+    public void setUserMeta(TUserMeta userMeta) {
+        this.userMeta = userMeta;
     }
 }
