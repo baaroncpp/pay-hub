@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductCommissionTemplateRepository extends CrudRepository<Long, TProductCommissionTemplate> {
+public interface ProductCommissionTemplateRepository extends CrudRepository<TProductCommissionTemplate,Long> {
 }

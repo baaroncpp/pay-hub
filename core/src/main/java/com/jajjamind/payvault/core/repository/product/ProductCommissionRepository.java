@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * 13:09
  **/
 @Repository
-public interface ProductCommissionRepository extends CrudRepository<Long, TProductCommission> {
+public interface ProductCommissionRepository extends CrudRepository<TProductCommission,Long> {
 }
