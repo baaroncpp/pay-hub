@@ -1,7 +1,6 @@
 package com.payhub.data.mtn.mtnModel;
 
-public class ActivateBundleResponseSuccess {
-    private String statusCode;
+public class Data {
     private String subscriptionId;
     private String subscriptionProviderId;
     private String subscriptionName;
@@ -12,24 +11,16 @@ public class ActivateBundleResponseSuccess {
     private String registrationChannel;
     private String startDate;
     private String endDate;
-    private String email;
+    private String mail;
     private double amountCharged;
     private String subscriptionPaymentSource;
-    private boolean sendSMSNotification;
+    private String sendSMSNotification;
     private String beneficiaryId;
     private boolean autoRenew;
     private String transactionId;
     private String statusDescription;
 
-    public ActivateBundleResponseSuccess() {
-    }
-
-    public String getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public Data() {
     }
 
     public String getSubscriptionId() {
@@ -112,12 +103,12 @@ public class ActivateBundleResponseSuccess {
         this.endDate = endDate;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMail() {
+        return mail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public double getAmountCharged() {
@@ -136,11 +127,11 @@ public class ActivateBundleResponseSuccess {
         this.subscriptionPaymentSource = subscriptionPaymentSource;
     }
 
-    public boolean isSendSMSNotification() {
+    public String getSendSMSNotification() {
         return sendSMSNotification;
     }
 
-    public void setSendSMSNotification(boolean sendSMSNotification) {
+    public void setSendSMSNotification(String sendSMSNotification) {
         this.sendSMSNotification = sendSMSNotification;
     }
 

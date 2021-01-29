@@ -1,4 +1,4 @@
-package com.payhub.data.mtn.entity;
+package com.payhub.data.mtn.entity.jpa;
 
 import com.payhub.data.mtn.constants.BundleCategory;
 import lombok.Data;

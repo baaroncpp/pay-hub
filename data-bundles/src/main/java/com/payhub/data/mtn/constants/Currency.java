@@ -1,5 +1,5 @@
 package com.payhub.data.mtn.constants;
 
-public class ResponseStatusCode {
-
+public enum Currency {
+    UGX, KSH
 }

@@ -1,4 +1,4 @@
-package com.payhub.data.mtn.entity;
+package com.payhub.data.mtn.entity.jpa;
 
 import com.payhub.data.airtel.constant.BundlePaymentStatus;
 import com.payhub.data.airtel.entity.BundlePayment;

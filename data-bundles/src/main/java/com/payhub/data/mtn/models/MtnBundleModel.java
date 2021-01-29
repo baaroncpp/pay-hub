@@ -1,2 +1,4 @@
-package com.payhub.data.mtn.models;public class MtnBundleModel {
+package com.payhub.data.mtn.models;
+
+public class MtnBundleModel {
 }
