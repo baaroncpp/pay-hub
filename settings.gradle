@@ -2,5 +2,7 @@ rootProject.name = 'payvault-aggregators'
 include 'commons'
 include 'core'
 include 'serenity-tests'
-
+include 'untitled'
+include 'mobile-money'
+include 'interswitch'
 

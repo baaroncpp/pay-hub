@@ -1,0 +1,12 @@
+#airtel money configurations
+airtelmoney.payhub.username=
+airtelmoney.payhub.password=
+airtelmoney.payhub.account.msisdn=
+airtelmoney.payhub.account.pin=
+
+#mtn mobile money config
+mtn.mobile.money.baseurl=
+mtn.mobile.money.username=
+mtn.mobile.money.password=
+mtn.payhub.account.msisdn=
+mtn.payhub.account.name=
