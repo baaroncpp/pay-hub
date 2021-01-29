@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 public class PayvaultConstants {
 	
 	public static String INTERSWITCH_BASE_URL = "https://interswitch.io/";
-	public static String PAYVAULT_CORE_BASE_URL = "http://94.237.96.34:6192";
 	/*
 	@Value("${interswitch.base.url}")
 	public void setINTERSWITCH_BASE_URL(String value) {
