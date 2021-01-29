@@ -1,4 +1,6 @@
-package com.payvault.mobilemoney.mtn.mtnModels;
+package com.payhub.mobilemoney.mtn.mtnModels;
+
+import com.payhub.mobilemoney.mtn.constants.Status;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

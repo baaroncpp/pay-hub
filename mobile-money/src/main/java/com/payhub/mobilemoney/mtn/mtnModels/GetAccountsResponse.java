@@ -5,5 +5,5 @@ import java.util.List;
 
 @XmlRootElement(name = "getaccountsresponse")
 public class GetAccountsResponse {
-    List<com.payvault.mobilemoney.mtn.mtnModels.Account> accountslist;
+    List<Account> accountslist;
 }
