@@ -33,7 +33,7 @@ public class BankSteps extends BaseSteps {
         currentBank = response.as(Bank.class);
         Assertions.assertThat(currentBank).isNotNull();
         Assertions.assertThat(currentBank.getAccountName()).isNotEmpty();
-        Assertions.assertThat(currentBank.getId()).isGreaterThan(0);
+        Assertions.assertThat(currentBank.getId()).isPositive();
         Assertions.assertThat(currentBank.getAccountNumber()).isEqualToIgnoringCase(accountNumber);
         return this;
     }

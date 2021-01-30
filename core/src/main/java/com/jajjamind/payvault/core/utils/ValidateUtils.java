@@ -12,7 +12,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.CountryEnum;
 public class ValidateUtils {
 
     private ValidateUtils(){}
-    
+
    public static CountryEnum validateAndGetCountry(String countryCode){
         final  CountryEnum country = CountryEnum.getFromISO2Code(countryCode);
         Validate.notNull(country, ErrorMessageConstants.COUNTRY_PROVIDED_DOES_NOT_FOUND,countryCode);

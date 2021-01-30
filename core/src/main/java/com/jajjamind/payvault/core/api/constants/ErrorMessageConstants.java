@@ -22,5 +22,7 @@ public class ErrorMessageConstants {
     public static final String COUNTRY_PROVIDED_DOES_NOT_FOUND = "Country with code %s could not be found";
     public static final String COMPANY_WITH_ID_COULD_NOT_BE_FOUND = "Company with ID %s could not be found";
     public static final String COUNTRY_PROVIDED_DOES_NOT_MATCH = "Company country %s and agent's country %s do not match";
+    public static final String ACCOUNT_WITH_ID_NO_FOUND = "Account with id %s not found";
+    public static final String USER_WITH_ID_NOT_FOUND = "User with ID %s not found";
 
 }

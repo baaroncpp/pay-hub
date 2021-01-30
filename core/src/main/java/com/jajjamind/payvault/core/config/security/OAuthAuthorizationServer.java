@@ -9,13 +9,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -49,6 +49,9 @@ public class OAuthAuthorizationServer extends AuthorizationServerConfigurerAdapt
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    public UserDetailsService userDetailsService;
+
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 
@@ -61,6 +64,7 @@ public class OAuthAuthorizationServer extends AuthorizationServerConfigurerAdapt
         endpoints.authenticationManager(authenticationManager)
                 .tokenStore(tokenStore())
                 .tokenEnhancer(tokenEnhancerChain)
+                .userDetailsService(userDetailsService)
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
     }
 
@@ -73,7 +77,7 @@ public class OAuthAuthorizationServer extends AuthorizationServerConfigurerAdapt
 
     @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        var converter = new JwtAccessTokenConverter();
+        var converter = new CustomAccessTokenConverter();
 
         KeyStoreKeyFactory keyStoreKeyFactory =
                 new KeyStoreKeyFactory(
