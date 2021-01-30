@@ -9,7 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public abstract class RealTimeUtil {
+public class RealTimeUtil {
 	private static final Logger DEBUGLOG;
 	private static long sequenceNumMaxValue;
 	private static long sequenceNumMinValue;
