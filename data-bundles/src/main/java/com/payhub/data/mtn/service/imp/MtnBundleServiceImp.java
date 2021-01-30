@@ -1,2 +1,4 @@
-package com.payhub.data.mtn.service.imp;public class MtnBundleServiceImp {
+package com.payhub.data.mtn.service.imp;
+
+public class MtnBundleServiceImp {
 }

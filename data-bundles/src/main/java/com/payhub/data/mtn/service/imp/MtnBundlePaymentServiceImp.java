@@ -5,20 +5,17 @@ import com.google.gson.JsonObject;
 import com.payhub.data.airtel.constant.BundlePaymentStatus;
 import com.payhub.data.mtn.entity.jpa.MtnBundle;
 import com.payhub.data.mtn.entity.jpa.MtnBundlePayment;
-import com.payhub.data.mtn.models.MtnBundlePaymentModel;
 import com.payhub.data.mtn.models.MtnBundlePriceModel;
-import com.payhub.data.mtn.models.TransactionStatusModel;
-import com.payhub.data.mtn.mtnModel.ActivateBundleRequest;
-import com.payhub.data.mtn.mtnModel.ActivateBundleResponseSuccess;
-import com.payhub.data.mtn.mtnModel.ResponseFailure;
-import com.payhub.data.mtn.mtnModel.ValidBundleData;
+import com.payhub.data.mtn.models.MtnTransactionStatusModel;
+import com.payhub.data.mtn.mtnModel.*;
 import com.payhub.data.mtn.network.MtnBundleApiService;
 import com.payhub.data.mtn.network.RetrofitMtnBundlesService;
 import com.payhub.data.mtn.repository.MtnBundlePaymentRepository;
 import com.payhub.data.mtn.repository.MtnBundleRepository;
-import com.payhub.data.mtn.service.BuyBundle;
+import com.payhub.data.mtn.models.BuyBundle;
 import com.payhub.data.mtn.service.MtnBundlePaymentService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -27,6 +24,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
+@Service
 public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
 
     @Value("{mtn.data.registration.channel}")
@@ -34,6 +32,15 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
 
     @Value("{mtn.data.payhub.msisdn}")
     private String accountMsisdn;
+
+    @Value("{mtn.data.payhub.subscription.name}")
+    private String subscriptionName;
+
+    @Value("{mtn.data.payhub.subscription.provider.id}")
+    private String subscriptionProviderId;
+
+    @Value("{mtn.data.payhub.subscription.payment.source}")
+    private String subscriptionPaymentSource;
 
     private MtnBundleRepository mtnBundleRepository;
     private MtnBundlePaymentRepository mtnBundlePaymentRepository;
@@ -95,10 +102,10 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
         activateBundleRequest.setBeneficiaryId(buyBundle.getMsisdn());
         activateBundleRequest.setSubscriptionId(mtnBundle.get().getBundleName());
         activateBundleRequest.setSendSMSNotification(Boolean.FALSE);
-        activateBundleRequest.setSubscriptionName("PayHub");
-        activateBundleRequest.setSubscriptionProviderId("CIS");
+        activateBundleRequest.setSubscriptionName(subscriptionName);
+        activateBundleRequest.setSubscriptionProviderId(subscriptionProviderId);
         activateBundleRequest.setRegistrationChannel(regChannel);
-        activateBundleRequest.setSubscriptionPaymentSource("EVDS");
+        activateBundleRequest.setSubscriptionPaymentSource(subscriptionPaymentSource);
 
         String transactionId = UUIDUtil.getUUID();
 
@@ -136,7 +143,7 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
     }
 
     @Override
-    public TransactionStatusModel getBundlePaymentStatus(String id) {
+    public MtnTransactionStatusModel getBundlePaymentStatus(String id) {
         Optional<MtnBundlePayment> mtnBundlePayment = mtnBundlePaymentRepository.findById(id);
         if(mtnBundlePayment.isEmpty()){
             throw new RuntimeException("Payment not found");
@@ -148,15 +155,38 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
 
         Response<JsonObject>  response = null;
 
-
-        
-
         try {
             response = call.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        MtnTransactionStatusModel mtnTransactionStatusModel = new MtnTransactionStatusModel();
+
+        Gson gson = new Gson();
+
+        if(response.isSuccessful()){
+            TransactionStatusResponse transactionStatusResponse = gson.fromJson(response.body(), TransactionStatusResponse.class);
+
+            mtnTransactionStatusModel.setMtnTransactionId(transactionStatusResponse.getServices().getCis().getData().get(1).getTransactionId());
+            mtnTransactionStatusModel.setBundleName(transactionStatusResponse.getServices().getCis().getData().get(1).getSubscriptionId());
+            mtnTransactionStatusModel.setSubscriptionStatus(transactionStatusResponse.getServices().getCis().getData().get(1).getSubscriptionStatus());
+            mtnTransactionStatusModel.setCustomerMsisdn(transactionStatusResponse.getServices().getCis().getData().get(1).getBeneficiaryId());
+            mtnTransactionStatusModel.setPaymentId(id);
+            mtnTransactionStatusModel.setAutoRenew(transactionStatusResponse.getServices().getCis().getData().get(1).isAutoRenew());
+        }else if(response.code() == 412){
+            TransactionStatusResponse transactionStatusResponse = gson.fromJson(response.body(), TransactionStatusResponse.class);
+
+            mtnTransactionStatusModel.setMtnTransactionId(transactionStatusResponse.getServices().getCis().getData().get(1).getTransactionId());
+            mtnTransactionStatusModel.setBundleName(transactionStatusResponse.getServices().getCis().getData().get(1).getSubscriptionId());
+            mtnTransactionStatusModel.setSubscriptionStatus(transactionStatusResponse.getServices().getCis().getData().get(1).getSubscriptionStatus());
+            mtnTransactionStatusModel.setCustomerMsisdn(transactionStatusResponse.getServices().getCis().getData().get(1).getBeneficiaryId());
+            mtnTransactionStatusModel.setPaymentId(id);
+            mtnTransactionStatusModel.setAutoRenew(transactionStatusResponse.getServices().getCis().getData().get(1).isAutoRenew());
+        }else{
+            throw new RuntimeException("");
+        }
+
+        return mtnTransactionStatusModel;
     }
 }

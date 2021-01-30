@@ -1,4 +1,4 @@
-package com.payhub.data.mtn.service;
+package com.payhub.data.mtn.models;
 
 public class BuyBundle {
     private String msisdn;
