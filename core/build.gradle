@@ -35,14 +35,19 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	compile 'org.springframework.boot:spring-boot-starter-webflux'
 	compile 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
 	compile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.4.1'
+
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
+	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.9'
+	testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
+	testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.2')
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.4.2')
+	testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
 
 	implementation project(':commons')
 
@@ -56,6 +61,7 @@ ext['springCloudVersion']='2020.0.0-SNAPSHOT'
 test {
 	useJUnitPlatform()
 	finalizedBy jacocoTestReport
+	testLogging.events("passed","failed","skipped")
 }
 
 dependencyManagement {

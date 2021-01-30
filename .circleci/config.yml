@@ -1,0 +1,73 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:11-jdk
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      - image: circleci/postgres:9.6.7
+        environment:
+          POSTGRES_DB: payvault
+          POSTGRES_USER: payvault
+          POSTGRES_PASSWORD: ?1234#23
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+      - checkout
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run: sudo apt update && sudo apt install postgresql-client
+      - run:
+          name: Create initial schemas
+          command: |
+                    echo ?1234#23 > .pgpass && psql -h localhost -U payvault -p 5432 \
+                    -c "CREATE SCHEMA core;"
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: gradle dependencies
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      # run tests!
+      - run:
+          name: Test commons
+          command: ./gradlew commons:test
+      - run:
+          name: Test core
+          command: ./gradlew core:test
+      - run:
+          name: Run serenity BDD
+          command: ./gradlew core:bootRun
+          background: true
+      - run:
+          name: Wait for app
+          command: dockerize -wait tcp://localhost:9005 -timeout 1m
+      - run:
+          name: Run serenity test
+          command: ./gradlew serenity-tests:test
+

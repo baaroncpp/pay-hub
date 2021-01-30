@@ -31,11 +31,11 @@ payvault:
 
 
 jwt:
-  key: 8484iriir
+  key: ${PV_JWT_KEY} # for test 8484iriir
   certificate:
-    password: uU488495!@#@360
-    alias: test
-    private-key: test.jks
+    password: ${PV_JWT_PASSWORD} # For test uU488495!@#@360
+    alias: ${PV_JWT_ALIAS} # test
+    private-key: ${PV_JWT_CERT} # test.jks
 
 security:
   oauth2:

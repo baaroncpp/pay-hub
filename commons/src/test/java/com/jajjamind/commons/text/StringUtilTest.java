@@ -1,17 +1,17 @@
 package com.jajjamind.commons.text;
 
-import org.assertj.core.api.AssertionErrorCollector;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author akena
  * 23/11/2020
  * 15:23
  **/
-@RunWith(MockitoJUnitRunner.class)
+//@ExtendWith(MockitoExtension.class)
 public class StringUtilTest {
 
 
