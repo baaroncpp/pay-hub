@@ -1,17 +1,18 @@
 package com.payhub.data.mtn.network;
 
-import com.payhub.data.airtel.network.DseApiService;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class RetrofitMtnBundlesService {
 
     private static String base_url;
@@ -42,10 +43,9 @@ public class RetrofitMtnBundlesService {
                         @Override
                         public Response intercept(Chain chain) throws IOException {
                             Request newRequest = chain.request().newBuilder()
-                                    /*.addHeader(ACCEPT, "application/json")
-                                    .addHeader(CONTENT_TYPE, "application/json")
+                                    .addHeader("Content-Type", "application/json;charset=UTF-8")
                                     .addHeader("transactionId", transactionId)
-                                    .addHeader("x-api-key", DSE_PASSWORD)*/
+                                    .addHeader("x-api-key", apiKey)
                                     .build();
                             return chain.proceed(newRequest);
                         }

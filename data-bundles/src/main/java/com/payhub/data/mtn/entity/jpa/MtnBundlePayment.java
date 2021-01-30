@@ -32,7 +32,7 @@ public class MtnBundlePayment {
     @Column(name = "status", nullable = false)
     private BundlePaymentStatus status;
 
-    @Column(name = "transactioind", nullable = false)
+    @Column(name = "transactionid", nullable = false)
     private String transactionId;
 
     @Column(name = "description", nullable = false)

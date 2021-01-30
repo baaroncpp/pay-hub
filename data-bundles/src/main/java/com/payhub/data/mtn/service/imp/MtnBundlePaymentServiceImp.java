@@ -3,6 +3,8 @@ package com.payhub.data.mtn.service.imp;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.payhub.data.airtel.constant.BundlePaymentStatus;
+import com.payhub.data.airtel.constant.DseErrorCodes;
+import com.payhub.data.mtn.constants.ResponseStatusCode;
 import com.payhub.data.mtn.entity.jpa.MtnBundle;
 import com.payhub.data.mtn.entity.jpa.MtnBundlePayment;
 import com.payhub.data.mtn.models.MtnBundlePriceModel;
@@ -21,8 +23,7 @@ import retrofit2.Response;
 
 import java.com.jajjamind.commons.utils.UUIDUtil;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
@@ -83,7 +84,7 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
             mtnBundlePriceModel.setBundleId(mtnBundle.get().getBundleName());
             mtnBundlePriceModel.setCurrency(validBundleData.getData().getCurrency());
             mtnBundlePriceModel.setName(validBundleData.getData().getBundleType());
-        }else{
+        }else if(response.body() != null && response.code() != 201){
             ResponseFailure responseFailure = gson.fromJson(response.body(), ResponseFailure.class);
             throw new RuntimeException(responseFailure.getError()+": "+responseFailure.getMessage());
         }
@@ -134,9 +135,11 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
             mtnBundlePayment.setDescription(activateBundleResponseSuccess.getSubscriptionDescription());
             mtnBundlePayment.setStatus(BundlePaymentStatus.COMPLETED);
 
-        }else{
+        }else if(response.body() != null && response.code() != 201){
             ResponseFailure responseFailure = gson.fromJson(response.body(), ResponseFailure.class);
             throw new RuntimeException(responseFailure.getError()+": "+responseFailure.getMessage());
+        }else{
+            throw new RuntimeException("GENERAL FAILURE");
         }
 
         return mtnBundlePaymentRepository.save(mtnBundlePayment);
@@ -184,7 +187,13 @@ public class MtnBundlePaymentServiceImp implements MtnBundlePaymentService {
             mtnTransactionStatusModel.setPaymentId(id);
             mtnTransactionStatusModel.setAutoRenew(transactionStatusResponse.getServices().getCis().getData().get(1).isAutoRenew());
         }else{
-            throw new RuntimeException("");
+            int responseCode = response.code();
+            List<ResponseStatusCode> dseErrorCodes = new ArrayList<>(Arrays.asList(ResponseStatusCode.values()));
+            Optional<ResponseStatusCode> ec = dseErrorCodes.stream().filter(code -> code.getHttpCode() == responseCode).findFirst();
+            if(ec.isPresent()){
+                throw new RuntimeException(ec.get().getMessage());
+            }
+            throw new RuntimeException("GENERAL FAILURE");
         }
 
         return mtnTransactionStatusModel;

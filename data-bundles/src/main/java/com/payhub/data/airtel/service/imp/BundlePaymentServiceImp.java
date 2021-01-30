@@ -61,7 +61,7 @@ public class BundlePaymentServiceImp implements BundlePaymentService {
 			e.printStackTrace();
 		}
 
-		if(response.body() != null) {
+		if(response.isSuccessful() && response.body() != null) {
 
 			if(response.body().has("resultDesc") && response.body().has("resultCode")) {
 				String msg = response.body().get("resultDesc").getAsString();

@@ -5,12 +5,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class RetrofitDseService {
 	
 	private static String ACCEPT = "Accept";

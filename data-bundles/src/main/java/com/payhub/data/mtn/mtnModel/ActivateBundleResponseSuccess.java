@@ -1,5 +1,7 @@
 package com.payhub.data.mtn.mtnModel;
 
+import javax.persistence.Id;
+
 public class ActivateBundleResponseSuccess {
     private String statusCode;
     private String subscriptionId;
@@ -18,6 +20,8 @@ public class ActivateBundleResponseSuccess {
     private boolean sendSMSNotification;
     private String beneficiaryId;
     private boolean autoRenew;
+
+    @Id
     private String transactionId;
     private String statusDescription;
 
