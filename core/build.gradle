@@ -4,6 +4,7 @@ plugins {
 	id 'java'
 	id 'jacoco'
 	id 'pmd'
+	id 'groovy'
 }
 
 group = 'com.jajjamind'
