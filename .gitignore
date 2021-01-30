@@ -20,3 +20,4 @@ gradle-app.setting
 .idea/**
 
 core/out/*
+commons/out/*
