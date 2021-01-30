@@ -26,6 +26,9 @@ jobs:
       TERM: dumb
 
     steps:
+      - run:
+          name: setup groovy build enviroment
+          command: curl -s get.sdkman.io | bash && source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install groovy
       - checkout
       - run:
           name: install dockerize
