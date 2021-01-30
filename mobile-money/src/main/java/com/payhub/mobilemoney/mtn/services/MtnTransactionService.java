@@ -8,7 +8,7 @@ import com.payhub.mobilemoney.mtn.mtnModels.GetBalanceResponse;
 import com.payhub.mobilemoney.mtn.mtnModels.InitiateTransferCompletedRequest;
 import com.payhub.mobilemoney.mtn.mtnModels.InitiateTransferResponse;
 
-public interface TransactionService {
+public interface MtnTransactionService {
     Transaction initiateTransfer(DepositModel depositModel);
     boolean completeCashOutTransaction(InitiateTransferCompletedRequest initiateTransferCompletedRequest);
     Transaction cashInTransaction(WithdrawModel withdrawModel);

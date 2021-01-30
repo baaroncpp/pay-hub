@@ -10,7 +10,7 @@ import com.payhub.mobilemoney.airtel.models.DepositTransactionModel;
 import com.payhub.mobilemoney.airtel.network.*;
 import com.payhub.mobilemoney.airtel.network.RetrofitAirtelMoneyService;
 import com.payhub.mobilemoney.airtel.repository.TransactionRepository;
-import com.payhub.mobilemoney.airtel.service.TransactionService;
+import com.payhub.mobilemoney.airtel.service.AirtelTransactionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TransactionServiceImp implements TransactionService {
+public class AirtelTransactionServiceImp implements AirtelTransactionService {
 
     @Value("{airtelmoney.payhub.username}")
     private String username;
@@ -40,7 +40,7 @@ public class TransactionServiceImp implements TransactionService {
 
     private TransactionRepository transactionRepository;
 
-    public TransactionServiceImp(TransactionRepository transactionRepository){
+    public AirtelTransactionServiceImp(TransactionRepository transactionRepository){
         this.transactionRepository = transactionRepository;
     }
 

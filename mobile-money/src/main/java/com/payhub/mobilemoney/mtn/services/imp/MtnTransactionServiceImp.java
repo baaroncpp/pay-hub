@@ -12,7 +12,7 @@ import com.payhub.mobilemoney.mtn.network.MtnAPIService;
 import com.payhub.mobilemoney.mtn.network.RetrofitMTNService;
 import com.payhub.mobilemoney.mtn.repository.TransactionApprovalRepository;
 import com.payhub.mobilemoney.mtn.repository.TransactionRepository;
-import com.payhub.mobilemoney.mtn.services.TransactionService;
+import com.payhub.mobilemoney.mtn.services.MtnTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
-public class TransactionServiceImp implements TransactionService {
+public class MtnTransactionServiceImp implements MtnTransactionService {
 
     @Value("{mtn.payhub.account.msisdn}")
     private String accountMsisdn;
@@ -36,8 +36,8 @@ public class TransactionServiceImp implements TransactionService {
     private TransactionApprovalRepository transactionApprovalRepository;
 
     @Autowired
-    public TransactionServiceImp(TransactionRepository transactionRepository,
-                                 TransactionApprovalRepository transactionApprovalRepository){
+    public MtnTransactionServiceImp(TransactionRepository transactionRepository,
+                                    TransactionApprovalRepository transactionApprovalRepository){
         this.transactionRepository = transactionRepository;
         this.transactionApprovalRepository = transactionApprovalRepository;
     }

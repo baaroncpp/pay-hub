@@ -2,6 +2,7 @@ package com.payhub.mobilemoney.config;
 
 import com.payhub.mobilemoney.airtel.network.AirtelMoneyApiService;
 import com.payhub.mobilemoney.airtel.network.RetrofitAirtelMoneyService;
+import com.payhub.mobilemoney.api.MobileMoneyApi;
 import com.payhub.mobilemoney.mtn.network.MtnAPIService;
 import com.payhub.mobilemoney.mtn.network.RetrofitMTNService;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MobileMoneyConfig {
+
+    @Bean
+    public MobileMoneyApi getMobileMoneyApi(){
+        return new MobileMoneyApi();
+    }
 
     @Bean
     public AirtelMoneyApiService getAirtelMoneyApiService(){

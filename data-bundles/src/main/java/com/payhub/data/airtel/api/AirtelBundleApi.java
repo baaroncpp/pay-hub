@@ -1,4 +1,4 @@
-package com.payhub.data.airtel.airtelbundleapi;
+package com.payhub.data.airtel.api;
 
 import com.payhub.data.airtel.service.BundlePaymentService;
 import com.payhub.data.airtel.service.BundleReceiptService;
