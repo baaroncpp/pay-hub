@@ -15,7 +15,7 @@ public class AuditedEntity extends BaseEntityLong{
     private TUser createdBy;
     private TUser modifiedBy;
 
-    @JoinColumn(name = "created_by",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "created_by",referencedColumnName = "id",insertable = true,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getCreatedBy() {
         return createdBy;
@@ -25,7 +25,7 @@ public class AuditedEntity extends BaseEntityLong{
         this.createdBy = createdBy;
     }
 
-    @JoinColumn(name = "modified_by",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "modified_by",referencedColumnName = "id",insertable = false,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getModifiedBy() {
         return modifiedBy;

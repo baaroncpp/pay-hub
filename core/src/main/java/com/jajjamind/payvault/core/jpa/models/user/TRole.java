@@ -4,29 +4,18 @@ import com.jajjamind.payvault.core.jpa.models.BaseEntityInteger;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
  * @author akena
- * 25/11/2020
- * 11:10
+ * 26/01/2021
+ * 13:58
  **/
 @Entity
-@Table(name = "t_group",schema = "core")
-public class TGroup extends BaseEntityInteger {
+@Table(name = "t_role",schema = "core")
+public class TRole extends BaseEntityInteger {
     private String name;
     private String note;
-    private TGroupAuthority groupAuthority;
-
-    @OneToOne(mappedBy = "group")
-    public TGroupAuthority getGroupAuthority() {
-        return groupAuthority;
-    }
-
-    public void setGroupAuthority(TGroupAuthority groupAuthority) {
-        this.groupAuthority = groupAuthority;
-    }
 
     @Column(name = "name")
     public String getName() {
@@ -45,6 +34,4 @@ public class TGroup extends BaseEntityInteger {
     public void setNote(String note) {
         this.note = note;
     }
-
-
 }

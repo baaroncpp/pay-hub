@@ -1,10 +1,9 @@
 package com.jajjamind.payvault.core.jpa.models.user;
 
 import com.jajjamind.payvault.core.jpa.models.BaseEntityLong;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author akena
@@ -13,15 +12,18 @@ import java.util.List;
  **/
 @Entity
 @Table(name = "t_user",schema = "core")
-public class TUser extends BaseEntityLong {
+public class TUser extends BaseEntityLong implements Serializable {
 
     private String username;
     private String password;
     private boolean accountLocked;
     private boolean accountExpired;
     private boolean credentialExpired;
+    private boolean approved;
     private TUserAuthority userAuthority;
-    private TUserMeta userMeta;
+    private transient TUserMeta userMeta;
+    private Boolean isDeleted;
+    private Long approvedBy;
 
 
     @Column(name = "username")
@@ -87,5 +89,32 @@ public class TUser extends BaseEntityLong {
 
     public void setUserMeta(TUserMeta userMeta) {
         this.userMeta = userMeta;
+    }
+
+    @Column(name = "approved")
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    @Column(name = "is_deleted")
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    @Column(name = "approved_by")
+    public Long getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(Long approvedBy) {
+        this.approvedBy = approvedBy;
     }
 }

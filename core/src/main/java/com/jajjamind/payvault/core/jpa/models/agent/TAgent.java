@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.jpa.models.agent;
 
 import com.jajjamind.payvault.core.jpa.models.enums.AgentTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
+import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.jpa.models.user.TUserMeta;
 
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class TAgent extends AuditedEntity {
 
     private AgentTypeEnum type;
-    private  TUser approvedBy;
+    private TUser approvedBy;
     private String externalId;
     private String pin;
     private String username;
@@ -33,6 +34,7 @@ public class TAgent extends AuditedEntity {
     private TUserMeta userMeta;
     private TAgent enrolledBy;
     private LocalDateTime reactivatedOn;
+    private ApprovalEnum approvalStatus;
 
     @JoinColumn(name = "id",referencedColumnName = "agent_id",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
@@ -115,7 +117,7 @@ public class TAgent extends AuditedEntity {
     }
 
     public void setNonDisabled(Boolean nonDisabled) {
-        nonDisabled = nonDisabled;
+        this.nonDisabled = nonDisabled;
     }
 
     @Column(name = "non_locked_pin")
@@ -183,5 +185,15 @@ public class TAgent extends AuditedEntity {
 
     public void setReactivatedOn(LocalDateTime reactivatedOn) {
         this.reactivatedOn = reactivatedOn;
+    }
+
+    @Column(name = "approval_status")
+    @Enumerated(EnumType.STRING)
+    public ApprovalEnum getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(ApprovalEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }

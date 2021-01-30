@@ -7,9 +7,19 @@ package com.jajjamind.payvault.core.jpa.models.enums;
  **/
 public enum AccountTypeEnum {
 
-    MAIN,
-    COLLECTION,
-    BULK_PAYMENT,
-    COMMISSION,
-    PAYOUT
+    MAIN ("MN"),
+    COLLECTION("CL"),
+    BULK_PAYMENT ("BP"),
+    COMMISSION ("CM"),
+    PAYOUT("PO");
+
+    private final String acronym;
+
+    AccountTypeEnum(String acronym){
+        this.acronym = acronym;
+    }
+
+    public String getAcronym(){
+        return this.acronym;
+    }
 }

@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.jpa.models.user;
 
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
+import com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions;
 import com.jajjamind.payvault.core.jpa.models.enums.GenderEnum;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 
@@ -19,7 +20,7 @@ public class TUserMeta extends AuditedEntity {
     private String firstName;
     private String lastName;
     private String middleName;
-    private Integer userId;
+    private Long userId;
     private Long agentId;
     private String phoneNumber;
     private String phoneNumber2;
@@ -32,8 +33,10 @@ public class TUserMeta extends AuditedEntity {
     private String identification;
     private String identificationNumber;
     private String identificationPath;
-    private boolean nonVerifiedEmail;
-    private boolean nonVerifiedPhoneNumber;
+    private Boolean nonVerifiedEmail;
+    private Boolean nonVerifiedPhoneNumber;
+    private TTermsAndConditions termsAndConditions;
+
 
     @Column(name = "first_name")
     public String getFirstName() {
@@ -63,11 +66,11 @@ public class TUserMeta extends AuditedEntity {
     }
 
     @Column(name = "user_id")
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -197,5 +200,15 @@ public class TUserMeta extends AuditedEntity {
 
     public void setNonVerifiedPhoneNumber(boolean nonVerifiedPhoneNumber) {
         this.nonVerifiedPhoneNumber = nonVerifiedPhoneNumber;
+    }
+
+    @JoinColumn(name = "terms_and_condition_id", referencedColumnName = "id",insertable = true,updatable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    public TTermsAndConditions getTTermsAndConditions() {
+        return termsAndConditions;
+    }
+
+    public void setTTermsAndConditions(TTermsAndConditions termsAndConditions) {
+        this.termsAndConditions = termsAndConditions;
     }
 }

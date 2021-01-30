@@ -28,7 +28,7 @@ public class BaseEntityInteger {
         this.id = id;
     }
 
-    @Column(name = "created_on",insertable =false, updatable = false)
+    @Column(name = "created_on",insertable =true, updatable = false)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getCreatedOn() {
         return createdOn;
@@ -38,7 +38,7 @@ public class BaseEntityInteger {
         this.createdOn = createdOn;
     }
 
-    @Column(name = "modified_on")
+    @Column(name = "modified_on",insertable = false,updatable = true)
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getModifiedOn() {
         return modifiedOn;

@@ -76,8 +76,8 @@ public class TBankAccount extends BaseEntityInteger {
         this.currency = currency;
     }
 
-    @JoinColumn(name = "country_id",referencedColumnName = "id",insertable = false,updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id",referencedColumnName = "id",insertable = true,updatable = true)
+    @OneToOne(fetch = FetchType.EAGER)
     public TCountry getCountry() {
         return country;
     }

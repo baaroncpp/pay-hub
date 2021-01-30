@@ -80,7 +80,7 @@ public class TBankDeposit {
         this.bankReference = bankReference;
     }
 
-    @JoinColumn(name = "bank_id",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "bank_id",referencedColumnName = "id",insertable = true,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TBankAccount getBank() {
         return bank;
