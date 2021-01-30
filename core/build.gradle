@@ -91,3 +91,24 @@ pmd {
 	rulePriority = 5
 	// ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
+
+sourceSets {
+	main {
+		java {
+			srcDirs = [] // Dont compile java code twice
+		}
+		groovy {
+			srcDirs += ['src/main/java']
+		}
+
+	}
+
+	test {
+		java {
+			srcDirs = []
+		}
+		groovy {
+			srcDirs += ['src/test/java']
+		}
+	}
+}
