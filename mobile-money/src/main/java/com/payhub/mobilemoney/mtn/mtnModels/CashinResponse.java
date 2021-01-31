@@ -1,7 +1,5 @@
 package com.payhub.mobilemoney.mtn.mtnModels;
 
-import lombok.Data;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -15,7 +13,6 @@ import javax.xml.bind.annotation.XmlType;
         "offeridentities",
         "financialtransactionid"
 })
-@Data
 public class CashinResponse {
     private Amount fee;
     private Amount senderbalanceafter;

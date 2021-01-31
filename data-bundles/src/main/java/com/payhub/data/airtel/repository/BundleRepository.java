@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface BundleRepository extends JpaRepository<Bundle, String> {
 
-
+    Optional<Bundle> findByName(String name);
 }

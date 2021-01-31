@@ -1,7 +1,5 @@
 package com.payhub.mobilemoney.mtn.mtnModels;
 
-import lombok.Data;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -14,7 +12,6 @@ import javax.xml.bind.annotation.XmlType;
         "sendernote",
         "receivermessage"
 })
-@Data
 public class CashinRequest {
     private String sendingfri;
     private String receivingfri;

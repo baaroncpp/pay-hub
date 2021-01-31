@@ -1,12 +1,10 @@
 package com.payhub.data.mtn.entity.jpa;
 
 import com.payhub.data.airtel.constant.BundlePaymentStatus;
-import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
 @Entity
 @Table(name = "t_mtn_bundle_payment", schema = "mtn_bundles")
 public class MtnBundlePayment {
@@ -87,5 +85,21 @@ public class MtnBundlePayment {
 
     public void setStatus(BundlePaymentStatus status) {
         this.status = status;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

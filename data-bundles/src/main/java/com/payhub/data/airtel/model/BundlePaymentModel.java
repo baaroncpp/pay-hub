@@ -1,8 +1,5 @@
 package com.payhub.data.airtel.model;
 
-import lombok.Data;
-
-@Data
 public class BundlePaymentModel {
     private String bundleid;
     private String customerNumber;

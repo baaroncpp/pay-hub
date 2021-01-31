@@ -1,7 +1,6 @@
 package com.payhub.data.mtn.entity.jpa;
 
 import com.payhub.data.mtn.constants.BundleCategory;
-import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 
-@Data
 @Entity
 @Table(name = "t_mtn_bundle", schema = "mtn_bundles")
 public class MtnBundle {

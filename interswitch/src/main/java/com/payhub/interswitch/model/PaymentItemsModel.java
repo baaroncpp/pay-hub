@@ -3,13 +3,7 @@ package com.payhub.interswitch.model;
 import java.util.List;
 
 import com.payhub.interswitch.jpa.entity.PaymentItem;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Data
-@Setter
-@Getter
 public class PaymentItemsModel {
 	List<PaymentItem> paymentitems;
 

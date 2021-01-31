@@ -1,6 +1,5 @@
 package com.payhub.mobilemoney.mtn.mtnModels;
 
-import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -18,7 +17,6 @@ import javax.xml.bind.annotation.XmlType;
         "totalpositivereservation",
         "bankdomainname"
 })
-@Data
 public class Account {
     private String fri;
     private String accountstatus;

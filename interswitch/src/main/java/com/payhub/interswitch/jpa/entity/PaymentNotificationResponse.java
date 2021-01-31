@@ -1,14 +1,11 @@
 package com.payhub.interswitch.jpa.entity;
 
-import lombok.Data;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
-@Data
 @Entity
 @Table(name = "t_payment_notification_response",schema="interswitch")
 public class PaymentNotificationResponse {

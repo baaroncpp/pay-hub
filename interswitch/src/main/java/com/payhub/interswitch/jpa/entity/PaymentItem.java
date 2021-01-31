@@ -1,11 +1,8 @@
 package com.payhub.interswitch.jpa.entity;
 
-import lombok.Data;
-
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
 @Entity
 @Table(name = "t_paymentitem", schema = "interswitch")
 public class PaymentItem  implements java.io.Serializable {

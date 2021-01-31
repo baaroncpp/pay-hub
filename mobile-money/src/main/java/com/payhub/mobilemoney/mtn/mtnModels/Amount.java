@@ -1,12 +1,10 @@
 package com.payhub.mobilemoney.mtn.mtnModels;
 
 import com.payhub.mobilemoney.mtn.constants.Currency;
-import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "amount")
-@Data
 public class Amount {
     private double amount;
     private Currency currency;

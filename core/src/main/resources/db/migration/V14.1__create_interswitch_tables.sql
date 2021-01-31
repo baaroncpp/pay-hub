@@ -1,3 +1,5 @@
+CREATE SCHEMA interswitch;
+
 create table interswitch.t_paymentitem(
 	paymentcode VARCHAR PRIMARY KEY,
     interswitch_billerid VARCHAR NOT NULL,

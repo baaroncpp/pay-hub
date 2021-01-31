@@ -1,3 +1,5 @@
+CREATE SCHEMA mtn_bundles;
+
 CREATE TABLE mtn_bundles.t_mtn_bundle (
     id VARCHAR PRIMARY KEY,
     bundle_name VARCHAR UNIQUE,
@@ -8,7 +10,7 @@ CREATE TABLE mtn_bundles.t_mtn_bundle (
 CREATE TABLE mtn_bundles.t_mtn_bundle_payment (
     id VARCHAR PRIMARY KEY,
     bundleid VARCHAR UNIQUE NOT NULL,
-    amount DOUBLE NOT NULL,
+    amount NUMERIC NOT NULL,
     createdon TIMESTAMP,
     customernumber VARCHAR NOT NULL,
     status VARCHAR NOT NULL,

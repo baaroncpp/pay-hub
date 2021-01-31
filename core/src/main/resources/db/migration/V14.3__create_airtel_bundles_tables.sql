@@ -1,9 +1,11 @@
+create schema airtel_data;
+
 create table airtel_data.t_bundle(
 	id VARCHAR PRIMARY KEY,
     name VARCHAR UNIQUE NOT NULL,
     code VARCHAR NOT NULL,
     durationdays INTEGER NOT NULL,
-    price DOUBLE NOT NULL
+    price NUMERIC NOT NULL
 );
 
 create table airtel_data.t_bundle_payment(
@@ -16,7 +18,7 @@ create table airtel_data.t_bundle_payment(
 
 create table airtel_data.t_bundle_receipt(
 	id VARCHAR PRIMARY KEY,
-    bundlepaymentid UNIQUE VARCHAR NOT NULL,
+    bundlepaymentid VARCHAR NOT NULL UNIQUE,
     responsedescription VARCHAR,
     bundlepaymentstatus VARCHAR NOT NULL
 );

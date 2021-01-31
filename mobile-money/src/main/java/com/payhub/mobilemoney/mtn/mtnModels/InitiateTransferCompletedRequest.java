@@ -1,8 +1,6 @@
 package com.payhub.mobilemoney.mtn.mtnModels;
 
 import com.payhub.mobilemoney.mtn.constants.Status;
-import com.payhub.mobilemoney.mtn.mtnModels.RecieverInfo;
-import lombok.Data;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,7 +14,6 @@ import javax.xml.bind.annotation.XmlType;
         "status",
         "communicationchannel"
 })
-@Data
 public class InitiateTransferCompletedRequest {
     private String financialtransactionid;
     private String externaltransactionid;

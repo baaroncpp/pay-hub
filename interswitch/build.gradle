@@ -2,7 +2,9 @@ plugins {
     id 'java'
 }
 
-version 'unspecified'
+group = 'com.jajjamind'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
@@ -15,8 +17,6 @@ dependencies {
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.1'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.1'
-
-    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
 
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.9.0'

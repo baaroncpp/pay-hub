@@ -21,3 +21,6 @@ gradle-app.setting
 
 **/core/out/**
 **/commons/out/**
+**/data-bundles/out/**
+**/interswitch/out/**
+**/mobile-money/out/**

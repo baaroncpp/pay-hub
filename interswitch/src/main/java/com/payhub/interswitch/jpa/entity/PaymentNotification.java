@@ -1,11 +1,8 @@
 package com.payhub.interswitch.jpa.entity;
 
 
-import lombok.Data;
-
 import javax.persistence.*;
 
-@Data
 @Entity
 @Table(name = "t_payment_notification",schema="interswitch")
 public class PaymentNotification {

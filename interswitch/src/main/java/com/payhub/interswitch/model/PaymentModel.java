@@ -1,12 +1,6 @@
 package com.payhub.interswitch.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Data
-@Setter
-@Getter
 public class PaymentModel {
 	private String customerNumber;
 	private long amount;

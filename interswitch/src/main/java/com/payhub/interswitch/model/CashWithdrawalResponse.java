@@ -1,12 +1,6 @@
 package com.payhub.interswitch.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Data
-@Getter
-@Setter
 public class CashWithdrawalResponse {	
 	private String responseMessage;
 	private String responseCode;
