@@ -40,6 +40,9 @@ class Jooqify {
 
     String[] args
 
+    def i = 0
+    def k = 0
+
     static main(args) {
         new Jooqify(args: args).go()
     }
@@ -197,6 +200,22 @@ class Jooqify {
                 object : 'Object'].get(lowCaseHint)
     }
 
+    def String fieldsCodeBlock(fields){
+        i = fields.size()
+        k = 0
+        fields.each { f ->
+
+            writeln("""builder.append("" ${f.fullFieldName()}""")
+
+            if(k !=i ){
+                writeln("""builder.append(",")""")
+            }
+
+            k++
+
+        }
+    }
+
     IndentHelper generateCode(className, List<SqlField> fields, List<NestedClass> classes, body) {
         IndentHelper p = new IndentHelper()
 
@@ -343,7 +362,7 @@ class Jooqify {
 
                 }
 
-                codeBlock('public RecordsList<Result> listAndCount(MultiValueMap<String,?> map)') {
+                codeBlock('public RecordList<Result> listAndCount(MultiValueMap<String,?> map)') {
                     writeln 'return new RecordList<Result>(count(map),list(map));'
                 }
 
@@ -355,10 +374,29 @@ class Jooqify {
                     writeln "return context.fetchOne(this.query(addCountParams(map))).getValue(0,Long.class);"
                 }
 
+                codeBlock('public String getAllFields()'){
+                    writeln "final StringBuilder builder = new StringBuilder();"
+                    i = fields.size()
+                    k = 0
+                    fields.each { f ->
+
+                        writeln("""builder.append($f.constant);""")
+                        k++
+                        if(k !=i ){
+                            writeln("""builder.append(",");""")
+                        }else{
+                            writeln "return builder.toString();"
+                        }
+
+                    }
+
+                }
+
             }
             writeln('//endregion')
         }
 
+        p
     }
 
 

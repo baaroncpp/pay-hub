@@ -3,7 +3,9 @@ package com.jajjamind.payvault.core.api.account;
 import com.jajjamind.payvault.core.BaseApi;
 import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
+import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
 import com.jajjamind.payvault.core.service.account.AccountService;
+import org.codehaus.jackson.map.Serializers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,40 +18,25 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/accounts")
-public class AccountApi implements BaseApi<Account> {
+public class AccountApi {
 
     @Autowired
     public AccountService accountService;
 
-    @Override
+    @PostMapping(consumes = BaseApi.APPLICATION_JSON,produces = BaseApi.APPLICATION_JSON)
     public Account add(@RequestBody  Account account) {
         return
                 accountService.addAccount(account);
     }
 
-    @Override
-    public Account get(Long id) {
-        return accountService.getAccountById(id);
+    @GetMapping(value = "/{id}",produces = BaseApi.APPLICATION_JSON)
+    public JooqAccountRepository.Result get(@PathVariable("id") Long id) {
+        return  accountService.getAccountById(id);
     }
 
     @GetMapping("/grouping/{id}")
-    public List<Account> getAccountByGroupId(Long id) {
+    public List<Account> getAccountByGroupId(@PathVariable("id") Long id) {
         return accountService.getAccountsByGroup(id);
-    }
-
-    @Override
-    public Account update(@RequestBody  Account account) {
-        return null;
-    }
-
-    @Override
-    public Account delete(long id) {
-        return null;
-    }
-
-    @Override
-    public List<Account> getAll() {
-        throw new UnsupportedOperationException();
     }
 
     @PostMapping("/group")

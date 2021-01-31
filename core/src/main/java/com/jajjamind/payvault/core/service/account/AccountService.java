@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.service.account;
 
 import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
+import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface AccountService {
     Account addAccount(Account account);
     AccountingGroup addAccountGrouping(AccountingGroup accountGroup);
     AccountingGroup updateAccountGrouping(AccountingGroup accountGroup);
-    Account getAccountById(Long id);
+    JooqAccountRepository.Result getAccountById(Long id);
     Account getAccountByCode(String code);
     Account updateAccount(Account account);
     Boolean deactivateAccount(Long accountId);

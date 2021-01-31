@@ -122,7 +122,7 @@ public class AccountSteps extends BaseSteps {
     @Step
     public AccountSteps shouldGetAccountsByGroup(Integer groupIdentifier){
         final String path = PATH+"/grouping/"+groupIdentifier;
-        response = given(spec).get(path);
+        response = given(spec).log().all().get(path);
         Assertions.assertThat(response)
                 .isNotNull();
         Assertions.assertThat(response.getStatusCode())

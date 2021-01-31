@@ -11,6 +11,7 @@ import com.jajjamind.payvault.core.jpa.models.account.TAccountGrouping;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
+import com.jajjamind.payvault.core.repository.JooqFilter;
 import com.jajjamind.payvault.core.repository.account.AccountGroupingRepository;
 import com.jajjamind.payvault.core.repository.account.AccountRepository;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
@@ -19,6 +20,8 @@ import com.jajjamind.payvault.core.utils.AuditService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -134,18 +137,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountById(Long id) {
-        Account account = null;
+    public JooqAccountRepository.Result getAccountById(Long id) {
 
-        try {
-            account = jooqAccountRepository.findAccountNotNull(id);
-        } catch (Exception e) {
-            e.printStackTrace();
+        final MultiValueMap<String,Object> queryMap = new LinkedMultiValueMap<>();
+        queryMap.add(JooqFilter.REQUIRED_PROPERTIES,jooqAccountRepository.getAllFields());
+        queryMap.add(JooqAccountRepository.FIELD_ID,id);
+        queryMap.add("sortBy",JooqAccountRepository.FIELD_ID);
+        queryMap.add("limit",1);
 
-        }
+       final  List<JooqAccountRepository.Result> accounts = jooqAccountRepository.list(queryMap);
 
-        Validate.notNull(account,"Failed to retrieve account information");
-        return account;
+        Validate.isTrue(!accounts.isEmpty(),"Failed to retrieve account information");
+        return accounts.get(0);
     }
 
     @Override

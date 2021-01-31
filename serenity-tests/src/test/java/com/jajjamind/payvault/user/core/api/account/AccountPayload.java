@@ -27,7 +27,7 @@ public class AccountPayload {
             object.put("accountGrouping",object1);
 
         }
-        object.put("name",BaseTestClass.getFaker().name().firstName());
+        object.put("name",BaseTestClass.getFaker().app().name());
         object.put("accountType",accountType);
         object.put("balanceToNotifyAt",500);
 
@@ -37,7 +37,7 @@ public class AccountPayload {
     public static JSONObject getCreateAccountGrouping(boolean canBulkLiquidate) throws JSONException {
         Faker faker = BaseTestClass.getFaker();
         JSONObject object = new JSONObject();
-        object.put("name", faker.beer().name());
+        object.put("name", faker.app().name());
         object.put("note",faker.lorem().paragraph());
         object.put("canBulkLiquidate",canBulkLiquidate);
 

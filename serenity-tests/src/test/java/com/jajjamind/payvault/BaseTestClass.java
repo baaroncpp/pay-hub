@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * @author akena
@@ -68,7 +69,7 @@ public abstract class BaseTestClass {
     }
 
     public static Faker getFaker(){
-        return Faker.instance(new Random((new Date()).getTime()));
+        return Faker.instance(new Random(System.currentTimeMillis()));
     }
 
 }

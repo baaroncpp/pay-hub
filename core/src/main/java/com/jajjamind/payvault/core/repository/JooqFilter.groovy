@@ -15,6 +15,7 @@ class JooqFilter {
 
     public static final String FILTER_OVERRIDE_PREFIX = '_ftype_'
     Map<String, DbField> fieldMap = [:]
+    public static final String REQUIRED_PROPERTIES = "requiredColumns";
     final List<String> RESERVED_PROPERTIES = ['limit', 'offset', 'requiredColumns', 'showList', 'sortBy', 'sortOrder']
     Map<String, List<String>> followerMap = [:]
 

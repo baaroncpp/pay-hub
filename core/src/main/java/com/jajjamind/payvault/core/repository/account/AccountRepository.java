@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.repository.account;
 
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,7 @@ public interface AccountRepository extends CrudRepository<TAccount,Long> {
 
     Optional<TAccount> findByName(@Param("name") String accountGrouping);
 
+    @Query("Select u from TAccount u inner join fetch u.accountGrouping where u.accountGrouping.id = :accountGrouping")
     List<TAccount> findByAccountGrouping(@Param("accountGrouping") Long accountGrouping);
 
 
