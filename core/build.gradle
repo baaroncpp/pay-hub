@@ -43,6 +43,11 @@ dependencies {
 	compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.3'
 	compile group: 'org.springdoc', name: 'springdoc-openapi-security', version: '1.5.3'
 
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-oauth2', version: '2.2.4.RELEASE'
+
 	compile 'org.springframework.boot:spring-boot-starter-webflux'
 	compile 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
 	compile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.4.1'
@@ -58,7 +63,9 @@ dependencies {
 	testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
 
 	implementation project(':commons')
-
+	implementation project(':interswitch')
+	implementation project(':mobile-money')
+	implementation project(':data-bundles')
 
 }
 
