@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
-import org.springframework.http.HttpStatus;
 
 /**
  * @author akena
@@ -20,7 +19,7 @@ public abstract class BaseSteps {
 
     public void checkThatCreationResponseOk(Response response){
         Assert.assertNotNull(response);
-        Assert.assertEquals(HttpStatus.OK.value(),response.getStatusCode());
+        Assert.assertEquals(200,response.getStatusCode());
     }
 
 }

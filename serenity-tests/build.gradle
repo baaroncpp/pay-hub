@@ -43,7 +43,7 @@ dependencies {
 	testCompile('org.assertj:assertj-core:1.7.0')
 	testCompile('org.slf4j:slf4j-simple:1.7.7')
 	testImplementation group: 'com.github.javafaker', name: 'javafaker', version: '0.15'
-	testImplementation project(':core')
+	testImplementation project(':core').sourceSets.main.output
 
 }
 
@@ -53,6 +53,7 @@ test {
 	test.failFast(false)
 	testLogging.showExceptions(true)
 	testLogging.showCauses(true)
+
 }
 
 

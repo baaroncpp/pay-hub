@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
+import lombok.EqualsAndHashCode;
 
 
 /**
@@ -13,6 +14,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
  * 23:14
  **/
 @lombok.Data
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductCommissionTemplate extends BasePricing{

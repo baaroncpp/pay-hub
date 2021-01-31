@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class AccountSteps extends BaseSteps {
     public AccountSteps shouldCreateAccountGroup(JSONObject body){
         response = given(spec).body(body.toString()).post(ACCOUNT_GROUP_PATH);
         Assert.assertNotNull(response);
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK.value());
+        Assert.assertEquals(response.getStatusCode(), 200);
         return this;
     }
 
@@ -44,7 +43,7 @@ public class AccountSteps extends BaseSteps {
         String name = response.jsonPath().getString("name");
         response = given(spec).get(ACCOUNT_GROUP_PATH+"/"+id);
         Assert.assertNotNull(response);
-        Assert.assertEquals(HttpStatus.OK.value(),response.getStatusCode());
+        Assert.assertEquals(200,response.getStatusCode());
 
         final String nameReturned = response.jsonPath().getString("name");
         Assertions.assertThat(nameReturned)
@@ -71,7 +70,7 @@ public class AccountSteps extends BaseSteps {
         response = given(spec).body(toUpdate.toString()).put(ACCOUNT_GROUP_PATH);
 
         Assert.assertNotNull(response);
-        Assert.assertEquals(HttpStatus.OK.value(),response.getStatusCode());
+        Assert.assertEquals(200,response.getStatusCode());
         Assertions.assertThat(response.jsonPath().getString("name"))
                 .isNotEmpty()
                 .isNotEqualTo(name);

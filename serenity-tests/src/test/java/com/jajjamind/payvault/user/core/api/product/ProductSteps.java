@@ -7,7 +7,6 @@ import net.thucydides.core.annotations.Step;
 import org.assertj.core.api.Assertions;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 
 /**
  * @author akena
@@ -27,7 +26,7 @@ public class ProductSteps extends BaseSteps {
 
         response = given(spec).body(productCommissionTemplate).post(PRODUCT_COMMISSION_TEMPLATE_PATH);
         Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(200);
 
         id = response.jsonPath().getInt("id");
         return this;
@@ -64,8 +63,7 @@ public class ProductSteps extends BaseSteps {
         response = given(spec).body(object.toString()).put(PRODUCT_COMMISSION_TEMPLATE_PATH);
 
         Assertions.assertThat(response).isNotNull();
-        var ok = HttpStatus.OK;
-        Assertions.assertThat(response.getStatusCode()).isEqualTo(ok.value());
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(200);
 
         return this;
     }

@@ -6,6 +6,7 @@ import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.agent.models.Agent;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author akena
@@ -13,6 +14,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
  * 03:33
  **/
 @lombok.Data
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductCommission extends  BasePricing{
