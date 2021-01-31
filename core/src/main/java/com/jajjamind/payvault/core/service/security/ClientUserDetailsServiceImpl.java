@@ -8,21 +8,12 @@ import com.jajjamind.payvault.core.repository.security.AppClientRepository;
 import com.jajjamind.payvault.core.security.models.ClientApp;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.ClientRegistrationException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author akena
@@ -37,7 +28,7 @@ public class ClientUserDetailsServiceImpl implements ClientDetailsService {
     AppClientRepository appClientRepository;
 
     @Override
-    public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
+    public ClientDetails loadClientByClientId(String clientId) {
 
         Optional<TAppClient> appClient = appClientRepository.getByName(clientId);
 
@@ -48,7 +39,7 @@ public class ClientUserDetailsServiceImpl implements ClientDetailsService {
             client = appClient.get();
         }
 
-        Validate.isTrue(client.getEnabled(),ErrorMessageConstants.APP_CLIENT_NOT_ENABLED,clientId);
+        Validate.isTrue(client !=null && client.getEnabled(),ErrorMessageConstants.APP_CLIENT_NOT_ENABLED,clientId);
 
         return getClientDetails(client);
     }

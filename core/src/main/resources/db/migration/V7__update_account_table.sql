@@ -1,0 +1,4 @@
+ALTER TABLE core.t_account ADD COLUMN is_assigned BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE core.t_account ALTER COLUMN status TYPE VARCHAR(10);
+ALTER TABLE core.t_account ALTER COLUMN type TYPE VARCHAR(20);
+ALTER TABLE core.t_account ALTER COLUMN code TYPE varchar(15);

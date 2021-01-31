@@ -1,12 +1,13 @@
 package com.jajjamind.payvault.core.jpa.models.account;
 
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
+import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -22,16 +23,17 @@ public class TAccount extends AuditedEntity {
     private AccountTypeEnum accountType;
     private TAccountGrouping accountGrouping;
     private BigDecimal balanceToNotifyAt;
-    private LocalDateTime balanceNotificationSentOn;
+    private Date balanceNotificationSentOn;
     private BigDecimal availableBalance;
-    private AccountTypeEnum accountStatus;
+    private AccountStatusEnum accountStatus;
     private String statusDescription;
-    private LocalDateTime activateOn;
+    private Date activateOn;
     private TUser activatedBy;
-    private LocalDateTime suspendedOn;
+    private Date suspendedOn;
     private TUser suspendedBy;
-    private LocalDateTime closedOn;
+    private Date closedOn;
     private TUser closedBy;
+    private Boolean isAssigned;
 
 
     @Column(name = "name")
@@ -62,7 +64,7 @@ public class TAccount extends AuditedEntity {
         this.accountType = accountType;
     }
 
-    @JoinColumn(name = "grouping",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "grouping",referencedColumnName = "id",insertable = true,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TAccountGrouping getAccountGrouping() {
         return accountGrouping;
@@ -82,11 +84,11 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "balance_notification_sent_on")
-    public LocalDateTime getBalanceNotificationSentOn() {
+    public Date getBalanceNotificationSentOn() {
         return balanceNotificationSentOn;
     }
 
-    public void setBalanceNotificationSentOn(LocalDateTime balanceNotificationSentOn) {
+    public void setBalanceNotificationSentOn(Date balanceNotificationSentOn) {
         this.balanceNotificationSentOn = balanceNotificationSentOn;
     }
 
@@ -101,11 +103,11 @@ public class TAccount extends AuditedEntity {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    public AccountTypeEnum getAccountStatus() {
+    public AccountStatusEnum getAccountStatus() {
         return accountStatus;
     }
 
-    public void setAccountStatus(AccountTypeEnum accountStatus) {
+    public void setAccountStatus(AccountStatusEnum accountStatus) {
         this.accountStatus = accountStatus;
     }
 
@@ -119,11 +121,11 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "activated_on")
-    public LocalDateTime getActivateOn() {
+    public Date getActivateOn() {
         return activateOn;
     }
 
-    public void setActivateOn(LocalDateTime activateOn) {
+    public void setActivateOn(Date activateOn) {
         this.activateOn = activateOn;
     }
 
@@ -139,11 +141,11 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "suspended_on")
-    public LocalDateTime getSuspendedOn() {
+    public Date getSuspendedOn() {
         return suspendedOn;
     }
 
-    public void setSuspendedOn(LocalDateTime suspendedOn) {
+    public void setSuspendedOn(Date suspendedOn) {
         this.suspendedOn = suspendedOn;
     }
 
@@ -158,15 +160,15 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "closed_on")
-    public LocalDateTime getClosedOn() {
+    public Date getClosedOn() {
         return closedOn;
     }
 
-    public void setClosedOn(LocalDateTime closedOn) {
+    public void setClosedOn(Date closedOn) {
         this.closedOn = closedOn;
     }
 
-    @JoinColumn(name = "close_by",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "closed_by",referencedColumnName = "id",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getClosedBy() {
         return closedBy;
@@ -174,5 +176,14 @@ public class TAccount extends AuditedEntity {
 
     public void setClosedBy(TUser closedBy) {
         this.closedBy = closedBy;
+    }
+
+    @Column(name = "is_assigned")
+    public Boolean getAssigned() {
+        return isAssigned;
+    }
+
+    public void setAssigned(Boolean assigned) {
+        isAssigned = assigned;
     }
 }

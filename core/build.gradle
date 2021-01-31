@@ -3,7 +3,8 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
 	id 'jacoco'
-	id 'pmd'
+	//id 'pmd'
+	id 'groovy'
 }
 
 group = 'com.jajjamind'
@@ -31,11 +32,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	implementation 'org.flywaydb:flyway-core'
-	//implementation 'org.springframework.cloud:spring-cloud-starter-oauth2'
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-oauth2', version: '2.2.4.RELEASE'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.security:spring-security-test'
+	compile group: 'org.jooq', name: 'jooq', version: '3.14.6'
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+	compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.3'
+	compile group: 'org.springdoc', name: 'springdoc-openapi-security', version: '1.5.3'
 
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -45,6 +51,8 @@ dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-webflux'
 	compile 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
 	compile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.4.1'
+
+	compile 'org.codehaus.groovy:groovy-all:3.0.7'
 
 	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
 	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.9'
@@ -84,10 +92,26 @@ jacoco {
 jacocoTestReport {
 	dependsOn(test)
 }
+//
+//pmd {
+//	consoleOutput = true
+//	toolVersion = "6.21.0"
+//	rulePriority = 5
+//	// ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+//}
 
-pmd {
-	consoleOutput = true
-	toolVersion = "6.21.0"
-	rulePriority = 5
-	// ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+sourceSets {
+	main {
+		groovy {
+			// this makes the groovy-compiler compile groovy- as well
+			// as java-files.
+			// Needed, because java is normally compiled before groovy.
+			// Since we are using groovy objects from java, we need it
+			// the other way round.
+			srcDirs = ['src/main/java']
+		}
+		java {
+			srcDirs = [] // don't compile Java code twice
+		}
+	}
 }

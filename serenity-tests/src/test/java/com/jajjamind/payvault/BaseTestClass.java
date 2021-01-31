@@ -1,5 +1,6 @@
 package com.jajjamind.payvault;
 
+import com.github.javafaker.Faker;
 import com.jajjamind.commons.utils.MapUtils;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -7,7 +8,10 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * @author akena
@@ -64,5 +68,8 @@ public abstract class BaseTestClass {
 
     }
 
+    public static Faker getFaker(){
+        return Faker.instance(new Random(System.currentTimeMillis()));
+    }
 
 }

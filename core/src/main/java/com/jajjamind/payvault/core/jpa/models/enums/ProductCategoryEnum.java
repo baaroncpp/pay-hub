@@ -6,11 +6,22 @@ package com.jajjamind.payvault.core.jpa.models.enums;
  * 14:12
  **/
 public enum ProductCategoryEnum {
-    DATA_BUNDLES,
-    AIRTIME,
-    ELECTRICITY,
-    WATER,
-    TV,
-    LOANS,
-    MOBILE_MONEY
+    DATA_BUNDLES("DB"),
+    AIRTIME ("AT"),
+    ELECTRICITY ("EL"),
+    WATER ("WT"),
+    TV ("TV"),
+    LOANS ("LN"),
+    MOBILE_MONEY ("MN"),
+    COLLECTIONS("CL");
+
+    private final String code;
+
+    ProductCategoryEnum(String code){
+        this.code = code;
+    }
+
+    public String getCode(){
+        return this.code;
+    }
 }

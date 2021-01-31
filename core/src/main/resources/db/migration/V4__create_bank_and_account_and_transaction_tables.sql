@@ -23,7 +23,7 @@ comment on column t_bank_account.currency is 'The currency for which this bank a
 create table t_bank_deposits (
 	id VARCHAR(32) not null primary key,
 	agent_id bigint not null references t_agent(id),
-	deposit_amount Money,
+	deposit_amount NUMERIC,
 	status VARCHAR(15) not null,
  	bank_reference varchar(50),
 	bank_id varchar(50),
@@ -53,7 +53,7 @@ create table t_agent_customer (
 	 account_id varchar(32),-- agent id and account id form composite key
 	 customer_name varchar(200),
 	 last_transacted_on timestamp,
-	 last_transaction_amount Money,
+	 last_transaction_amount NUMERIC,
 	 last_transaction_product integer references t_product(id),
 	 total_transactions bigint not null default 1,
 	 created_on timestamp not null default now(),
@@ -73,7 +73,7 @@ comment on column t_agent_customer.total_transactions is 'Total transactions tha
 create table t_product_commission_template (
 	id SERIAL primary key,
 	type varchar(15) not null, --  percent, normal chunk etc
-	flat_amount Money,
+	flat_amount NUMERIC,
 	percent_amount Decimal,
 	currency character(3),
 	active boolean not null default true,
@@ -93,7 +93,7 @@ create table t_product_commission (
 	id BIGSERIAL primary key,
 	t_agent_id bigint not null references t_agent(id),
 	type varchar(15) not null,
-	flat_amount  Money,
+	flat_amount  NUMERIC,
 	percent_amount Decimal,
 	active boolean not null default true,
 	currency character(3),
@@ -115,7 +115,7 @@ create table t_transaction (
 	product_id integer not null references t_product(id),
 	agent_id bigint not null references t_agent(id),
 	customer_id varchar(32) not null references t_agent_customer(id),
-	amount Money,
+	amount NUMERIC,
 	reversed boolean not null default false,
 	status varchar(15) not null , -- pending success etc
 	provider_status varchar(15),

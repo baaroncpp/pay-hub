@@ -19,11 +19,11 @@ public class TUserPreviousPassword extends BaseEntityLong {
 
     @JoinColumn(name = "user_id",referencedColumnName = "id",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
-    public TUser getAgent() {
+    public TUser getUser() {
         return user;
     }
 
-    public void setAgent(TUser agent) {
+    public void setUser(TUser user) {
         this.user = user;
     }
 

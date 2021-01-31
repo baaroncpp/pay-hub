@@ -45,3 +45,14 @@ security:
     client:
       client-id: client # Configure resource server independently as an app
       client-secret: secret
+
+springdoc:
+  version: '@springdoc.version@'
+  swagger-ui:
+    oauth:
+      clientId: client
+      clientSecret: secret
+  oAuthFlow:
+    password:
+      tokenUrl: http://localhost:9005/oauth/token
+      refreshUrl: http://localhost:9005/oauth/refresh

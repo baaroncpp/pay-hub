@@ -18,6 +18,7 @@ public class TTermsAndConditions extends AuditedEntity {
     private String versionNumber;
     private String content;
     private Boolean isActive;
+    private String target;
 
     @Column(name = "version_no")
     public String getVersionNumber() {
@@ -44,5 +45,14 @@ public class TTermsAndConditions extends AuditedEntity {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    @Column(name = "target")
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 }
