@@ -1,8 +1,12 @@
 package com.jajjamind.payvault.core.repository.product;
 
 import com.jajjamind.payvault.core.jpa.models.product.TProduct;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * @author akena
@@ -11,4 +15,8 @@ import org.springframework.stereotype.Repository;
  **/
 @Repository
 public interface ProductRepository extends CrudRepository<TProduct,Long> {
+
+    @Query("SELECT u from TProduct u WHERE u.name = :name and u.provider = :provider")
+    Optional<TProduct> findByNameAndProvider(@Param("name") String name,@Param("provider") String provider);
+
 }

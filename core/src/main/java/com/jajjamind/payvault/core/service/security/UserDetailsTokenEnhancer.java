@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.service.security;
 
 import com.jajjamind.commons.utils.MapUtils;
+import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -20,7 +21,9 @@ public class UserDetailsTokenEnhancer implements TokenEnhancer {
         Map info = MapUtils.create("generatedInZone", ZoneId.systemDefault().toString()).build();
 
         DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(accessToken);
-        info.put("user",authentication.getPrincipal());
+        LoggedInUser principal = (LoggedInUser)authentication.getPrincipal();
+        principal.setPassword(null);
+        info.put("user",principal);
         token.setAdditionalInformation(info);
         return token;
 

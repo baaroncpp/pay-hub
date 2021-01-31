@@ -6,6 +6,8 @@
 package com.jajjamind.commons.text;
 
 import java.util.*;
+import java.util.stream.IntStream;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -65,6 +67,23 @@ public abstract class StringUtil
         final StringBuilder builder = new StringBuilder(sequence.trim());
         builder.insert(0, "00000000000");
         return builder.substring(builder.length() - length, builder.length());
+    }
+
+    public static String getSequenceForDefinedZeros(final String value, final int sequenceLength) {
+        var sequence = "";
+        if (isEmpty(value)) {
+
+            IntStream.of(sequenceLength).forEach(t -> {
+                sequence.concat("0");
+            });
+           return  sequence;
+        }
+
+        var zeroLength = sequenceLength - value.length();
+        IntStream.of(zeroLength).forEach(t -> {
+            sequence.concat("0");
+        });
+        return sequence.concat(value);
     }
     
     public static String trimPhonenumber(String phonenumber) {

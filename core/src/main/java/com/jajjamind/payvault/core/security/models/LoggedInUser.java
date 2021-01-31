@@ -1,9 +1,11 @@
 package com.jajjamind.payvault.core.security.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,7 +15,9 @@ import java.util.List;
  * 12:37
  **/
 @lombok.Setter
-public class LoggedInUser implements UserDetails {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class LoggedInUser implements UserDetails, Serializable {
+
 
     @Getter
     private long id;

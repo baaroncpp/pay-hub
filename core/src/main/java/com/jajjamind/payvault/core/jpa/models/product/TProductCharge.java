@@ -1,7 +1,6 @@
 package com.jajjamind.payvault.core.jpa.models.product;
 
-import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
-import com.jajjamind.payvault.core.jpa.models.enums.ProductChargeTypeEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,79 +12,39 @@ import java.math.BigDecimal;
  **/
 @Entity
 @Table(name = "t_product_charge",schema = "core")
-public class TProductCharge  extends AuditedEntity {
+public class TProductCharge  extends TBasePricing {
 
-    private String name;
-    private ProductChargeTypeEnum chargeTypeEnum;
-    private BigDecimal chargeAmount;
-    private Float chargePercent;
-    private BigDecimal fromAmount;
-    private BigDecimal toAmount;
-    private String tariffGroupIdentifier;
+    private PricingTypeEnum chargeType;
+    private BigDecimal amount;
+    private Float percent;
     private Boolean nonActive;
-
-    @Column(name = "name")
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    public ProductChargeTypeEnum getChargeTypeEnum() {
-        return chargeTypeEnum;
+    public PricingTypeEnum getChargeType() {
+        return chargeType;
     }
 
-    public void setChargeTypeEnum(ProductChargeTypeEnum chargeTypeEnum) {
-        this.chargeTypeEnum = chargeTypeEnum;
+    public void setChargeType(PricingTypeEnum chargeType) {
+        this.chargeType = chargeType;
     }
 
     @Column(name = "charge_amount")
-    public BigDecimal getChargeAmount() {
-        return chargeAmount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setChargeAmount(BigDecimal chargeAmount) {
-        this.chargeAmount = chargeAmount;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     @Column(name = "charge_percent")
-    public Float getChargePercent() {
-        return chargePercent;
+    public Float getPercent() {
+        return percent;
     }
 
-    public void setChargePercent(Float chargePercent) {
-        this.chargePercent = chargePercent;
-    }
-
-    @Column(name = "from_amount")
-    public BigDecimal getFromAmount() {
-        return fromAmount;
-    }
-
-    public void setFromAmount(BigDecimal fromAmount) {
-        this.fromAmount = fromAmount;
-    }
-
-    @Column(name = "to_amount")
-    public BigDecimal getToAmount() {
-        return toAmount;
-    }
-
-    public void setToAmount(BigDecimal toAmount) {
-        this.toAmount = toAmount;
-    }
-
-    @Column(name = "tariff_group_id")
-    public String getTariffGroupIdentifier() {
-        return tariffGroupIdentifier;
-    }
-
-    public void setTariffGroupIdentifier(String tariffGroupIdentifier) {
-        this.tariffGroupIdentifier = tariffGroupIdentifier;
+    public void setPercent(Float percent) {
+        this.percent = percent;
     }
 
     @Column(name = "non_active")

@@ -19,4 +19,5 @@ gradle-app.setting
 **/serenity-tests/target/**
 .idea/**
 
-core/out/*
+**/core/out/**
+**/commons/out/**

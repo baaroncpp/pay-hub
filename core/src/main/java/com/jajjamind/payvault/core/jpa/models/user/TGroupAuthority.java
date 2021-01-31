@@ -1,9 +1,6 @@
 package com.jajjamind.payvault.core.jpa.models.user;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author akena
@@ -12,18 +9,30 @@ import javax.persistence.Table;
  **/
 @Entity
 @Table(name = "t_group_authority",schema = "core")
-public class TGroupAuthority {
-    @Id
-    private long groupId;
+public class TGroupAuthority  {
+    private Integer id;
+    private TGroup group;
     private String authority;
 
-    @Column(name = "group_id")
-    public long getGroupId() {
-        return groupId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setGroupId(long groupId) {
-        this.groupId = groupId;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Integer getId() {
+        return id;
+    }
+
+    @JoinColumn(name = "group_id",insertable = true,updatable = false)
+    @OneToOne
+    public TGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(TGroup group) {
+        this.group = group;
     }
 
     @Column(name = "authority")

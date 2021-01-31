@@ -1,8 +1,7 @@
 package com.jajjamind.payvault.core.jpa.models.product;
 
-import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
-import com.jajjamind.payvault.core.jpa.models.enums.CommissionTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,22 +13,22 @@ import java.math.BigDecimal;
  **/
 @Entity
 @Table(name = "t_product_commission_template",schema = "core")
-public class TProductCommissionTemplate extends AuditedEntity {
+public class TProductCommissionTemplate extends TBasePricing {
 
-    private CommissionTypeEnum type;
+    private PricingTypeEnum pricingType;
     private BigDecimal amount;
     private float percent;
     private CurrencyEnum currency;
-    private boolean active;
+    private Boolean status;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    public CommissionTypeEnum getType() {
-        return type;
+    public PricingTypeEnum getPricingType() {
+        return pricingType;
     }
 
-    public void setType(CommissionTypeEnum type) {
-        this.type = type;
+    public void setPricingType(PricingTypeEnum pricingType) {
+        this.pricingType = pricingType;
     }
 
     @Column(name = "flat_amount")
@@ -61,11 +60,11 @@ public class TProductCommissionTemplate extends AuditedEntity {
     }
 
     @Column(name = "active")
-    public boolean isActive() {
-        return active;
+    public Boolean isStatus() {
+        return status;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 }
