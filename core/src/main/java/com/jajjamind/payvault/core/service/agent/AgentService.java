@@ -15,6 +15,6 @@ import org.springframework.util.MultiValueMap;
 public interface AgentService extends BaseApiService<Agent> {
 
     RecordList<JooqAgentRepository.Result> queryForAgents(MultiValueMap<String,?> k);
-    void approveAgentCreation(String agentId,String comment);
+    void approveOrRejectAgentCreation(Long agentId,String status,String comment);
 
 }

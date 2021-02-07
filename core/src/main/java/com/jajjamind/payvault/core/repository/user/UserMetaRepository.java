@@ -25,4 +25,5 @@ public interface UserMetaRepository extends CrudRepository<TUserMeta,Long> {
 
     public Optional<TUserMeta> findByUserId(@Param("userId") Integer userId);
 
+    public Optional<TUserMeta> findByAgentId(@Param("agentId") Integer agentId);
 }
