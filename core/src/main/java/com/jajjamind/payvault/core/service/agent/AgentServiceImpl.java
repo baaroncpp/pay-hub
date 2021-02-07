@@ -150,15 +150,10 @@ public class AgentServiceImpl implements AgentService{
         auditService.stampAuditedEntity(updatedAgent);
         agentRepository.save(updatedAgent);
 
-        final Optional<TUserMeta> userMeta = Optional.of(oldAgent.getUserMeta());
+        final TUserMeta mUserMeta =  userMetaService.updateUserMetaProperties(agent.getUserMeta(), oldAgent.getUserMeta());
+        auditService.stampAuditedEntity(mUserMeta);
 
-        if(userMeta.isPresent()){
-
-            final TUserMeta mUserMeta =  userMetaService.updateUserMetaProperties(agent.getUserMeta(), oldAgent.getUserMeta());
-            auditService.stampAuditedEntity(mUserMeta);
-
-            userMetaRepository.save(mUserMeta);
-        }
+        userMetaRepository.save(mUserMeta);
 
 
         return agent;
@@ -263,7 +258,7 @@ public class AgentServiceImpl implements AgentService{
             auditService.stampAuditedEntity(agent);
 
             agentRepository.save(agent);
-            smsService.sendSmsMessage(agentCreationSMS(agent.getId().intValue(),""));
+            smsService.sendSmsMessage(agentCreationSMS(agent.getId().intValue()));
 
         }
 
@@ -282,7 +277,7 @@ public class AgentServiceImpl implements AgentService{
 
 
     //Not so sure if to save copy on my side -- May have to
-    private SmsMessage agentCreationSMS(Integer  agent,String generatedTemporaryPin){
+    private SmsMessage agentCreationSMS(Integer  agent){
 
         Optional<TConfiguration> smsConfig = configurationRepository.findByName(Constants.GET_AGENT_SMS_CONFIG_NAME);
         Validate.isTrue(smsConfig.isPresent(),"Failed to get client SMS notification message");

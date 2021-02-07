@@ -3,11 +3,9 @@ package com.jajjamind.payvault.core.jpa.models.bank;
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.agent.TAgent;
 import com.jajjamind.payvault.core.jpa.models.enums.TransactionStatusEnum;
-import com.jajjamind.payvault.core.jpa.models.user.TUser;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**

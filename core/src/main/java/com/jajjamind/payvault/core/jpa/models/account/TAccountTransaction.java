@@ -5,7 +5,6 @@ import com.jajjamind.payvault.core.jpa.models.enums.TransactionTypeEnum;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -212,6 +211,8 @@ public class TAccountTransaction {
             t.setId(this.id);
             t.setModifiedOn(this.modifiedOn);
             t.setStatusDescription(this.statusDescription);
+            t.setAccount(this.account);
+            t.setExternalTransactionId(this.externalTransactionId);
 
             return t;
 
