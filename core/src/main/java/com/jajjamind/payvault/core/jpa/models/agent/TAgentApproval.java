@@ -23,9 +23,10 @@ public class TAgentApproval extends AuditedEntity {
     private Date secondApproveOn;
     private ApprovalEnum status;
     private String note;
+    private String note2;
     private Integer approvalCount;
 
-    @JoinColumn(name = "agent_id",referencedColumnName = "id",insertable = true,updatable = false)
+    @JoinColumn(name = "agent_id",referencedColumnName = "id",insertable = true,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TAgent getAgent() {
         return agent;
@@ -35,7 +36,7 @@ public class TAgentApproval extends AuditedEntity {
         this.agent = agent;
     }
 
-    @JoinColumn(name = "approver_1",referencedColumnName = "id",insertable = true,updatable = false)
+    @JoinColumn(name = "approver_1",referencedColumnName = "id",insertable = true,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getApprover1() {
         return approver1;
@@ -102,5 +103,14 @@ public class TAgentApproval extends AuditedEntity {
 
     public void setApprovalCount(Integer approvalCount) {
         this.approvalCount = approvalCount;
+    }
+
+    @Column(name = "note_2")
+    public String getNote2() {
+        return note2;
+    }
+
+    public void setNote2(String note2) {
+        this.note2 = note2;
     }
 }

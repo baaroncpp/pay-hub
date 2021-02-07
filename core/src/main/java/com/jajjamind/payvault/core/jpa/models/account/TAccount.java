@@ -4,6 +4,7 @@ import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
+import com.jajjamind.payvault.core.utils.Money;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ public class TAccount extends AuditedEntity {
     private TAccountGrouping accountGrouping;
     private BigDecimal balanceToNotifyAt;
     private Date balanceNotificationSentOn;
-    private BigDecimal availableBalance;
+    private Money availableBalance;
     private AccountStatusEnum accountStatus;
     private String statusDescription;
     private Date activateOn;
@@ -93,11 +94,11 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "available_balance")
-    public BigDecimal getAvailableBalance() {
+    public Money getAvailableBalance() {
         return availableBalance;
     }
 
-    public void setAvailableBalance(BigDecimal availableBalance) {
+    public void setAvailableBalance(Money availableBalance) {
         this.availableBalance = availableBalance;
     }
 

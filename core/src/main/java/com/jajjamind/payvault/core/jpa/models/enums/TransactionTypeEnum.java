@@ -7,6 +7,8 @@ package com.jajjamind.payvault.core.jpa.models.enums;
  **/
 public enum TransactionTypeEnum {
 
-    DEBIT, //Money is coming into payvault system
-    CREDIT //Money is leaving payvault
+    CASH_FLOW_DEBIT, //Money is leaving account
+    CASH_FLOW_CREDIT, //Money is coming account
+    AGENT_TRANS_DEBIT,
+    AGENT_TRANS_CREDIT
 }

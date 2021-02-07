@@ -6,6 +6,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.TransactionTypeEnum;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -25,8 +26,8 @@ public class TAccountTransaction {
     private BigDecimal balanceBefore;
     private BigDecimal balanceAfter;
     private String externalTransactionId;
-    private LocalDateTime createdOn;
-    private LocalDateTime modifiedOn;
+    private Date createdOn;
+    private Date modifiedOn;
 
 
     @Column(name = "id")
@@ -116,20 +117,106 @@ public class TAccountTransaction {
     }
 
     @Column(name = "created_on",insertable = false,updatable = false)
-    public LocalDateTime getCreatedOn() {
+    public Date getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDateTime createdOn) {
+    public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
     }
 
     @Column(name = "modified_on")
-    public LocalDateTime getModifiedOn() {
+    public Date getModifiedOn() {
         return modifiedOn;
     }
 
-    public void setModifiedOn(LocalDateTime modifiedOn) {
+    public void setModifiedOn(Date modifiedOn) {
         this.modifiedOn = modifiedOn;
     }
+
+ //<editor-fold>
+    public static class Builder {
+
+        private String id;
+        private TAccount account;
+        private TransactionTypeEnum transactionType;
+        private Boolean nonReversal;
+        private TransactionStatusEnum transactionStatus;
+        private String statusDescription;
+        private BigDecimal balanceBefore;
+        private BigDecimal balanceAfter;
+        private String externalTransactionId;
+        private Date createdOn;
+        private Date modifiedOn;
+
+
+        public Builder(TAccount account){
+            this.account = account;
+        }
+
+        public Builder withId(String id){
+            this.id = id;
+            return this;
+
+        }
+
+        public Builder withTransactionType(TransactionTypeEnum transactionType){
+            this.transactionType = transactionType;
+            return this;
+        }
+
+        public Builder withNonReversal(Boolean nonReversal){
+            this.nonReversal = nonReversal;
+            return this;
+        }
+
+        public Builder withTransactionStatus(TransactionStatusEnum transactionStatus){
+            this.transactionStatus = transactionStatus;
+            this.statusDescription = transactionStatus.getDescription();
+            return this;
+        }
+
+        public Builder withBalanceBefore(BigDecimal balanceBefore){
+            this.balanceBefore = balanceBefore;
+            return this;
+        }
+
+        public Builder withBalanceAfter(BigDecimal balanceAfter){
+            this.balanceAfter = balanceAfter;
+            return this;
+        }
+
+        public Builder withExternalTransactionId(String externalTransactionId){
+            this.externalTransactionId = externalTransactionId;
+            return this;
+        }
+
+        public Builder withCreatedOn(Date createdOn){
+            this.createdOn = createdOn;
+            return this;
+        }
+
+        public Builder withModifiedOn(Date modifiedOn){
+            this.modifiedOn = modifiedOn;
+            return this;
+        }
+
+        public TAccountTransaction build(){
+            final TAccountTransaction t = new TAccountTransaction();
+            t.setTransactionStatus(this.transactionStatus);
+            t.setTransactionType(this.transactionType);
+            t.setNonReversal(this.nonReversal);
+            t.setBalanceAfter(this.balanceAfter);
+            t.setBalanceBefore(this.balanceBefore);
+            t.setCreatedOn(this.createdOn);
+            t.setId(this.id);
+            t.setModifiedOn(this.modifiedOn);
+            t.setStatusDescription(this.statusDescription);
+
+            return t;
+
+        }
+
+    }
+    //</editor-fold>
 }

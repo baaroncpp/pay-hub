@@ -1,5 +1,6 @@
 package com.jajjamind.payvault.core.jpa.models.bank;
 
+import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.agent.TAgent;
 import com.jajjamind.payvault.core.jpa.models.enums.TransactionStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
@@ -7,6 +8,7 @@ import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -15,32 +17,16 @@ import java.time.LocalDateTime;
  **/
 @Entity
 @Table(name = "t_bank_deposits",schema = "core")
-public class TBankDeposit {
+public class TBankDeposit extends AuditedEntity {
 
-    private String id;
     private TAgent agent;
     private BigDecimal amountDeposited;
     private TransactionStatusEnum status;
     private String bankReference;
     private TBankAccount bank;
     private String payslipImagePath;
-    private LocalDateTime payslipTimestamp;
-    private LocalDateTime createdOn;
-    private LocalDateTime modifiedOn;
-    private TUser createdBy;
-    private TUser modifiedBy;
-
-
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private Date payslipTimestamp;
+    private String externalDepositorName;
 
     @JoinColumn(name = "agent_id",referencedColumnName = "id",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
@@ -100,49 +86,20 @@ public class TBankDeposit {
     }
 
     @Column(name = "pay_slip_timestamp")
-    public LocalDateTime getPayslipTimestamp() {
+    public Date getPayslipTimestamp() {
         return payslipTimestamp;
     }
 
-    public void setPayslipTimestamp(LocalDateTime payslipTimestamp) {
+    public void setPayslipTimestamp(Date payslipTimestamp) {
         this.payslipTimestamp = payslipTimestamp;
     }
 
-    @Column(name = "created_on",insertable = false,updatable = false)
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
+    @Column(name = "depositor")
+    public String getExternalDepositorName() {
+        return externalDepositorName;
     }
 
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    @Column(name = "modified_on")
-    public LocalDateTime getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public void setModifiedOn(LocalDateTime modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    @JoinColumn(name = "created_by",referencedColumnName = "id",insertable = false,updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
-    public TUser getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(TUser createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @JoinColumn(name = "modified_by",referencedColumnName = "id",insertable = false,updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
-    public TUser getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(TUser modifiedBy) {
-        this.modifiedBy = modifiedBy;
+    public void setExternalDepositorName(String externalDepositorName) {
+        this.externalDepositorName = externalDepositorName;
     }
 }

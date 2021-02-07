@@ -1,4 +1,4 @@
-package java.com.jajjamind.commons.utils;
+package com.jajjamind.commons.utils;
 
 public class UUIDUtil {
     public static String getUUID() {

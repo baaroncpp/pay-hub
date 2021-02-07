@@ -6,7 +6,16 @@ package com.jajjamind.payvault.core.jpa.models.enums;
  * 11:42
  **/
 public enum TransactionStatusEnum {
-    PENDING,
-    SUCCESSFUL,
-    FAILED
+    PENDING("Transaction has not been fully processed"),
+    SUCCESSFUL("Transaction has been processed by all parties involved"),
+    FAILED("Transaction processing has failed");
+
+    private final String description;
+    private  TransactionStatusEnum(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return  this.description;
+    }
 }

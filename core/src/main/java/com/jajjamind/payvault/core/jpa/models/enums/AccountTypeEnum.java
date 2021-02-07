@@ -11,7 +11,8 @@ public enum AccountTypeEnum {
     COLLECTION("CL"),
     BULK_PAYMENT ("BP"),
     COMMISSION ("CM"),
-    PAYOUT("PO");
+    PAYOUT("PO"),
+    BUSINESS("BS");
 
     private final String acronym;
 
