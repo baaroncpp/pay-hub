@@ -8,7 +8,8 @@ package com.jajjamind.payvault.core.jpa.models.enums;
 public enum AccountStatusEnum {
     ACTIVE("Account is assigned to an agent or product already"),
     NOT_ACTIVE("Account is not assigned to any party and can be used"),
-    CLOSED("Account closed for ever and cannot be used");
+    CLOSED("Account closed for ever and cannot be used"),
+    SUSPENDED("Account is temporarily suspended but not closed");
 
     private final String description;
 

@@ -1,6 +1,9 @@
 package com.jajjamind.payvault.core.api.transaction;
 
+import com.jajjamind.payvault.core.BaseApi;
 import com.jajjamind.payvault.core.api.transaction.models.*;
+import com.jajjamind.payvault.core.service.transaction.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,36 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TransactionApi {
 
-    @PostMapping("/airtime")
-    public AirtimeTransaction buyAirtime(AirtimeTransaction airtimeTransaction){
-        return null;
+    @Autowired
+    TransactionService transactionService;
+
+    @PostMapping(value = "/",consumes = BaseApi.APPLICATION_JSON,produces = BaseApi.APPLICATION_JSON)
+    public TransactionResponse createTransaction(Transaction transaction){
+        return transactionService.createTransaction(transaction);
     }
 
 
-    @PostMapping("/utilities")
-    public UtilitiesTransaction payForUtilities(UtilitiesTransaction airtimeTransaction){
-        return null;
-    }
-
-    @PostMapping("/reverse")
-    public Transaction reverseTransaction(Transaction transaction){
-        return null;
-    }
-
-
-    @PostMapping("/mobilemoney/cashout")
-    public MobileMoneyCashoutTransaction mobileMoneyCashOut(MobileMoneyCashoutTransaction transaction){
-        return null;
-    }
-
-
-    @PostMapping("/mobilemoney/cashin")
-    public MobileMoneyCashInTransaction mobileMoneyCashIn(MobileMoneyCashInTransaction transaction){
-        return null;
-    }
-
-    @PostMapping("/data")
-    public DataTransaction buyMobileData(DataTransaction transaction){
-        return null;
-    }
 }

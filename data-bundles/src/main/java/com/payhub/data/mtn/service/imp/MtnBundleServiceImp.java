@@ -8,7 +8,7 @@ import com.payhub.data.mtn.service.MtnBundleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.com.jajjamind.commons.utils.UUIDUtil;
+import com.jajjamind.commons.utils.UUIDUtil;
 import java.util.List;
 import java.util.Optional;
 

@@ -128,8 +128,7 @@ public class TCashflowRequest extends AuditedEntity {
         this.approver2 = approver2;
     }
 
-    @JoinColumn(name = "not",referencedColumnName = "id",insertable = true,updatable = true)
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(name = "note1")
     public String getNote1() {
         return note1;
     }

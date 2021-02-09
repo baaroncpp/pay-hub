@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core;
 
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 /**
@@ -9,6 +10,7 @@ import java.util.List;
  * 11/01/2021
  * 15:37
  **/
+@RolesAllowed("ROLE.ADMIN")
 @RequestMapping("/default")
 public interface BaseApi<T> {
 

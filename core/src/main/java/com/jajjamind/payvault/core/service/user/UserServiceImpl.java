@@ -1,5 +1,6 @@
 package com.jajjamind.payvault.core.service.user;
 
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.agent.models.Country;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
@@ -13,11 +14,13 @@ import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.jpa.models.user.TUserApproval;
 import com.jajjamind.payvault.core.jpa.models.user.TUserMeta;
+import com.jajjamind.payvault.core.jpa.models.user.TUserPreviousPassword;
 import com.jajjamind.payvault.core.repository.agent.CountryRepository;
 import com.jajjamind.payvault.core.repository.agent.TermsAndConditionsRepository;
 import com.jajjamind.payvault.core.repository.security.UserRepository;
 import com.jajjamind.payvault.core.repository.user.UserApprovalRepository;
 import com.jajjamind.payvault.core.repository.user.UserMetaRepository;
+import com.jajjamind.payvault.core.repository.user.UserPreviousPasswordRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.utils.AuditService;
 import org.springframework.beans.BeanUtils;
@@ -58,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserApprovalRepository userApprovalRepository;
+
+    @Autowired
+    public UserPreviousPasswordRepository previousPasswordRepository;
 
 
     @Transactional
@@ -291,6 +297,39 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public void resetPassword(String oldPassword, String newPassword) {
+        LoggedInUser user = auditService.getLoggedInUser();
+        Validate.notNull(user,"Failed to locate user");
+
+        Optional<TUser> userOptional = userRepository.findUserById(user.getId().intValue());
+        Validate.isPresent(userOptional,"No valid system user found");
+
+        TUser mUser = userOptional.get();
+        Validate.isTrue(mUser.isApproved(),"User is not approved for system access");
+        Validate.isTrue(!mUser.isAccountExpired(),"User account has expired");
+        Validate.isTrue(mUser.getDeleted(),"Account with does not exist");
+        Validate.isTrue(mUser.isAccountLocked(),"Account has been locked");
+
+        if(passwordEncoder.matches(oldPassword,mUser.getPassword())){
+            mUser.setPassword(passwordEncoder.encode(newPassword));
+            mUser.setInitialPasswordReset(Boolean.TRUE);
+
+            auditService.stampLongEntity(mUser);
+            userRepository.save(mUser);
+
+            TUserPreviousPassword previousPassword = new TUserPreviousPassword();
+            previousPassword.setUser(mUser);
+            previousPassword.setNote("Password Reset");
+            previousPassword.setRemovalTime(DateTimeUtil.getCurrentUTCTime());
+
+            auditService.stampLongEntity(previousPassword);
+            previousPasswordRepository.save(previousPassword);
+        }else{
+            throw new IllegalStateException("Old password could not be verified");
+        }
     }
 
 

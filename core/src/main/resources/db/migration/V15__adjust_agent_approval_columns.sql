@@ -1,4 +1,4 @@
-ALTER TABLE core.t_agent_approval ADD COLUMN note_2 ;
+ALTER TABLE core.t_agent_approval ADD COLUMN note_2 TEXT;
 ALTER TABLE core.t_agent_approval ADD COLUMN modified_on TIMESTAMP;
 ALTER TABLE core.t_agent_approval ADD COLUMN modified_by INTEGER REFERENCES core.t_user(id);
 
@@ -16,18 +16,18 @@ CREATE TABLE core.t_configuration(
     modified_on TIMESTAMP
 );
 
-INSERT INTO core.t_configuration (name,actual_value,default_value,note,created_by)
+INSERT INTO core.t_configuration (name,actual_value,default_value,note,created_by,country_id)
 VALUES
-('AGENT_CREATE_SMS','Dear %s, your account with PayHub has been successfully created. Login with your pin to begin transacting','Dear %s, your account with PayHub has been successfully created. Login with your pin to begin transacting',
-'SMS that will be sent to every transacting agent after first time registration on the platform',1);
+('AGENT_CREATE_SMS','Dear %s, your account with PayHub has been successfully created. Login with your pin %s and username %s to begin transacting','Dear %s, your account with PayHub has been successfully created. Login with your pin %s and username %s to begin transacting',
+'SMS that will be sent to every transacting agent after first time registration on the platform',1,1);
 
 
 CREATE TABLE core.t_account_mapping (
     id SERIAL PRIMARY KEY,
-    bank_id INTEGER REFERENCES core.t_bank(id),
+    bank_id INTEGER REFERENCES core.t_bank_account(id),
     product_id INTEGER REFERENCES core.t_product(id),
     agent_id BIGINT REFERENCES core.t_agent(id),
-    account_id NUMERIC NOT NULL REFERENCES core.t_account(id),
+    account_id INTEGER NOT NULL REFERENCES core.t_account(id),
     status VARCHAR(20),
     created_on timestamp not null default now(),
     modified_on timestamp,
@@ -36,7 +36,7 @@ CREATE TABLE core.t_account_mapping (
 );
 
 create index t_acc_mapping_bk_index on core.t_account_mapping (bank_id);
-create index t_acc_mapping_pdt_index on core.t_account_mapping (product_id);
+create index t_acc_mapping_pdt2_index on core.t_account_mapping (product_id);
 create index t_acc_mapping_agt_index on core.t_account_mapping (agent_id);
 create index t_acc_mapping_act_index on core.t_account_mapping (account_id);
 

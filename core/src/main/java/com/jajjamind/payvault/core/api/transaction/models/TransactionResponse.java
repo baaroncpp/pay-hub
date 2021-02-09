@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author akena
- * 30/01/2021
- * 03:59
+ * 07/02/2021
+ * 17:27
  **/
 @lombok.Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataBundleListing {
+public class TransactionResponse {
 
-    private String bundleCode;
-    private String bundleName;
-    private String bundleAmount;
-    private String currency;
+    private String transactionId;
+    private String status;
+    private String statusDescription;
 }

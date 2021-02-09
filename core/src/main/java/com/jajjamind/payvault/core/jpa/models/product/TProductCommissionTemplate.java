@@ -17,7 +17,10 @@ public class TProductCommissionTemplate extends TBasePricing {
 
     private PricingTypeEnum pricingType;
     private BigDecimal amount;
+    private BigDecimal systemAmount;
     private float percent;
+    private float systemPercent;
+    private BigDecimal systemTariff;
     private CurrencyEnum currency;
     private Boolean status;
 
@@ -66,5 +69,33 @@ public class TProductCommissionTemplate extends TBasePricing {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    @Column(name = "system_flat_amount")
+    public BigDecimal getSystemAmount() {
+        return systemAmount;
+    }
+
+    public void setSystemAmount(BigDecimal systemAmount) {
+        this.systemAmount = systemAmount;
+    }
+
+    @Column(name = "system_percent_amount")
+    public float getSystemPercent() {
+        return systemPercent;
+    }
+
+
+    public void setSystemPercent(float systemPercent) {
+        this.systemPercent = systemPercent;
+    }
+
+    @Column(name = "system_tariff")
+    public BigDecimal getSystemTariff() {
+        return systemTariff;
+    }
+
+    public void setSystemTariff(BigDecimal systemTariff) {
+        this.systemTariff = systemTariff;
     }
 }

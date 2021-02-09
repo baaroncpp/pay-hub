@@ -31,10 +31,10 @@ public interface AccountRepository extends CrudRepository<TAccount,Long> {
     @QueryHints({
             @QueryHint(name = Constants.DB_LOCK_TIMEOUT_NAME,value = Constants.DB_LOCK_TIMEOUT)
     })
-    @Query("Select u from TAccount u where id = :id and u.isAssigned = true and u.accountStatus = 'ACTIVE'")
+    @Query("Select u from TAccount u where id = :id and u.assigned = true and u.accountStatus = 'ACTIVE'")
     Optional<TAccount> findByIdForBalanceUpdate(@Param("id") Long id);
 
-    @Query("Select u from TAccount u where id = :id and u.isAssigned = true and u.accountStatus = 'ACTIVE' and u.accountType in (:type)")
+    @Query("Select u from TAccount u where id = :id and u.assigned = true and u.accountStatus = 'ACTIVE' and u.accountType in (:type)")
     Optional<TAccount> findActiveByIdAndType(@Param("id") Long id,@Param("type") String... type);
 
 

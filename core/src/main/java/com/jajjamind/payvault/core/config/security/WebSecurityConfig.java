@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] SWAGGER_URL_PATHS = new String[] {
+            "**/termsofuse",
             "/v3/api-docs/**",
             "/swagger-ui.html**","/swagger-ui/**",
             "/configuration/security","/configuration/ui","/swagger-resources/**",

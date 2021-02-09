@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.jpa.models.product;
 
 import com.jajjamind.payvault.core.jpa.models.enums.CurrencyEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -17,9 +18,13 @@ public class TProductCommission extends TBasePricing {
 
     private PricingTypeEnum pricingType;
     private BigDecimal amount;
+    private BigDecimal systemAmount;
     private float percent;
+    private float systemPercent;
+    private BigDecimal systemTariff;
     private CurrencyEnum currency;
-    private boolean status;
+    private StatusEnum status;
+    private TProduct product;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
@@ -59,12 +64,51 @@ public class TProductCommission extends TBasePricing {
         this.currency = currency;
     }
 
-    @Column(name = "active")
-    public boolean isStatus() {
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    public StatusEnum getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(StatusEnum status) {
         this.status = status;
+    }
+
+    @JoinColumn(name = "product_id",referencedColumnName = "id",insertable = true,updatable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    public TProduct getProduct() {
+        return product;
+    }
+
+    public void setProduct(TProduct product) {
+        this.product = product;
+    }
+
+    @Column(name = "system_flat_amount")
+    public BigDecimal getSystemAmount() {
+        return systemAmount;
+    }
+
+    public void setSystemAmount(BigDecimal systemAmount) {
+        this.systemAmount = systemAmount;
+    }
+
+    @Column(name = "system_percent_amount")
+    public float getSystemPercent() {
+        return systemPercent;
+    }
+
+
+    public void setSystemPercent(float systemPercent) {
+        this.systemPercent = systemPercent;
+    }
+
+    @Column(name = "system_tariff")
+    public BigDecimal getSystemTariff() {
+        return systemTariff;
+    }
+
+    public void setSystemTariff(BigDecimal systemTariff) {
+        this.systemTariff = systemTariff;
     }
 }

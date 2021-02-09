@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.com.jajjamind.commons.utils.UUIDUtil;
+import com.jajjamind.commons.utils.UUIDUtil;
 import java.io.IOException;
 import java.util.*;
 

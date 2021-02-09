@@ -8,15 +8,23 @@ import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
 import com.jajjamind.payvault.core.jpa.models.account.TAccountGrouping;
+import com.jajjamind.payvault.core.jpa.models.account.TAccountMapping;
+import com.jajjamind.payvault.core.jpa.models.agent.TAgent;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.repository.JooqFilter;
 import com.jajjamind.payvault.core.repository.account.AccountGroupingRepository;
 import com.jajjamind.payvault.core.repository.account.AccountRepository;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
+import com.jajjamind.payvault.core.repository.agent.AgentRepository;
+import com.jajjamind.payvault.core.repository.bank.AccountMappingRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
+import com.jajjamind.payvault.core.service.utilities.AccountUtilities;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.Money;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +57,12 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     public JooqAccountRepository jooqAccountRepository;
 
+    @Autowired
+    public AccountMappingRepository accountMappingRepository;
+
+    @Autowired
+    public AgentRepository agentRepository;
+
     private static final Integer ACCOUNT_CODE_LENGTH = 6;
 
     @Override
@@ -73,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
         final Date creationDate = DateTimeUtil.getCurrentUTCTime();
         tAccount.setBalanceNotificationSentOn(creationDate);
         tAccount.setCreatedOn(creationDate);
-        tAccount.setAvailableBalance(BigDecimal.ZERO);
+        tAccount.setAvailableBalance(new Money(0));
         tAccount.setAccountStatus(AccountStatusEnum.NOT_ACTIVE);
         tAccount.setStatusDescription(AccountStatusEnum.NOT_ACTIVE.getDescription());
         tAccount.setAssigned(Boolean.FALSE);
@@ -176,9 +190,9 @@ public class AccountServiceImpl implements AccountService {
         Validate.isTrue(accountOptional.isPresent(), ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,id);
         TAccount account = accountOptional.get();
 
-        Validate.isTrue(!account.getAccountStatus().equals(AccountStatusEnum.NOT_ACTIVE),"Account is already deactivated");
+        Validate.isTrue(account.getAccountStatus().equals(AccountStatusEnum.ACTIVE),"Only an active account can be suspended");
 
-        account.setAccountStatus(AccountStatusEnum.ACTIVE);
+        account.setAccountStatus(AccountStatusEnum.SUSPENDED);
 
         Date date = DateTimeUtil.getCurrentUTCTime();
         LoggedInUser user = auditService.getLoggedInUser();
@@ -203,6 +217,7 @@ public class AccountServiceImpl implements AccountService {
         TAccount account = accountOptional.get();
 
         Validate.isTrue(!account.getAccountStatus().equals(AccountStatusEnum.ACTIVE),"Account is already active");
+        Validate.isTrue(!account.getAccountStatus().equals(AccountStatusEnum.CLOSED),"A closed account cannot be activated");
 
         account.setAccountStatus(AccountStatusEnum.ACTIVE);
 
@@ -231,16 +246,7 @@ public class AccountServiceImpl implements AccountService {
         Validate.isTrue(account.getAvailableBalance().compareTo(BigDecimal.ZERO) == 0,"Account balance has to be 0 to close account");
         Validate.isTrue(!account.getAssigned(),"Account that has been assigned cannot be closed");
 
-        account.setAccountStatus(AccountStatusEnum.CLOSED);
-
-        Date date = DateTimeUtil.getCurrentUTCTime();
-        LoggedInUser user = auditService.getLoggedInUser();
-
-        final TUser s = new TUser();
-        s.setId(user.getId());
-
-        account.setClosedBy(s);
-        account.setClosedOn(date);
+        closeAccount(account);
 
         auditService.stampAuditedEntity(account);
 
@@ -289,6 +295,140 @@ public class AccountServiceImpl implements AccountService {
             account.add(mAccount);
         });
         return account;
+    }
+
+    @Override
+    public void linkAgentCommissionAccount(Long agentId, Long accountId) {
+
+        Optional<TAccountMapping> accountMappingOptional = accountMappingRepository.findAgentCommissionAccountMapped(agentId);
+        Validate.isTrue(!accountMappingOptional.isPresent(),"Agent already has a commission account mapped. Disable to assign a new commission account");
+
+        Optional<TAgent> agentOptional = agentRepository.findById(agentId);
+        Validate.isPresent(agentOptional,ErrorMessageConstants.AGENT_WITH_ID_NOT_FOUND,agentId);
+
+        TAgent agent = agentOptional.get();
+
+        Validate.isTrue(agent.getNonDisabled(),"Agent has been disabled");
+        Validate.isTrue(agent.getNonLocked(),"Agent has been locked");
+        Validate.isTrue(agent.getApprovalStatus().equals(ApprovalEnum.APPROVED),"Agent has not been approved in system");
+
+        TAccount accountProvided = getCommissionAccountToAssign(accountId);
+
+        accountProvided.setAssigned(Boolean.TRUE);
+        accountProvided.setAccountStatus(AccountStatusEnum.ACTIVE);
+
+        auditService.stampAuditedEntity(accountProvided);
+        accountRepository.save(accountProvided);
+
+        TAccountMapping mapping = new TAccountMapping();
+        mapping.setAgentIdCommission(agentId);
+        mapping.setAccountId(accountProvided);
+        mapping.setStatus(StatusEnum.ACTIVE);
+
+        auditService.stampAuditedEntity(mapping);
+        accountMappingRepository.save(mapping);
+
+
+    }
+
+    private TAccount getCommissionAccountToAssign(Long accountId){
+
+        Optional<TAccount> account = accountRepository.findById(accountId);
+        Validate.isPresent(account,ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,accountId);
+
+        TAccount accountProvided = account.get();
+
+        AccountUtilities.checkThatAccountCanBeAssigned(accountProvided);
+        Validate.isTrue(account.get().getAccountType().equals(AccountTypeEnum.COMMISSION),ErrorMessageConstants.COMMISSION_ACCOUNT_REQUIRED);
+
+        return accountProvided;
+    }
+
+    @Override
+    public void linkSystemCommissionAccount(Long accountId) {
+
+        Optional<TAccountMapping> accountOptional = accountMappingRepository.findSystemCommissionAccountMapped();
+        Validate.isTrue(!accountOptional.isPresent(),"System commission account already exists, unmap first to change");
+
+        TAccount accountProvided = getCommissionAccountToAssign(accountId);
+
+        accountProvided.setAssigned(Boolean.TRUE);
+        accountProvided.setAccountStatus(AccountStatusEnum.ACTIVE);
+
+        auditService.stampAuditedEntity(accountProvided);
+        accountRepository.save(accountProvided);
+
+        TAccountMapping mapping = new TAccountMapping();
+        mapping.setAccountId(accountProvided);
+        mapping.setStatus(StatusEnum.ACTIVE);
+        mapping.setSystemAccount(Boolean.TRUE);
+
+        auditService.stampAuditedEntity(mapping);
+        accountMappingRepository.save(mapping);
+
+
+    }
+
+    @Override
+    public void unlinkAgentCommissionAccount(Long accountId, Long agentId) {
+
+        Optional<TAccountMapping> mappingOptional = accountMappingRepository.findAgentCommissionAccountMapped(agentId);
+        Validate.isPresent(mappingOptional,"Agent commission account mapping does not exist");
+
+        TAccountMapping mapping = mappingOptional.get();
+
+        TAccount account = mapping.getAccountId();
+        Validate.isTrue(account.getId().equals(accountId),"Account ID in mapped object do not match");
+
+        AccountUtilities.checkThatAccountCanBeUnAssigned(account);
+
+        mapping.setStatus(StatusEnum.NOT_ACTIVE);
+        auditService.stampAuditedEntity(mapping);
+        accountMappingRepository.save(mapping);
+
+        closeAccount(account);
+        auditService.stampAuditedEntity(account);
+
+        accountRepository.save(account);
+
+
+
+    }
+
+    @Override
+    public void unlinkSystemCommissionAccount(Long accountId) {
+
+        Optional<TAccountMapping> mappingOptional = accountMappingRepository.findSystemCommissionAccountMapped();
+        Validate.isPresent(mappingOptional,"System commission account mapping does not exist");
+
+        TAccountMapping mapping = mappingOptional.get();
+
+        TAccount account = mapping.getAccountId();
+        Validate.isTrue(account.getId().equals(accountId),"Account ID in mapped object do not match");
+
+        AccountUtilities.checkThatAccountCanBeUnAssigned(account);
+
+        mapping.setStatus(StatusEnum.NOT_ACTIVE);
+        auditService.stampAuditedEntity(mapping);
+        accountMappingRepository.save(mapping);
+
+        closeAccount(account);
+        auditService.stampAuditedEntity(account);
+
+        accountRepository.save(account);
+
+    }
+
+    private void closeAccount(TAccount account)
+    {
+        LoggedInUser user = auditService.getLoggedInUser();
+
+        final TUser s = new TUser();
+        s.setId(user.getId());
+
+        account.setClosedBy(s);
+        account.setClosedOn(DateTimeUtil.getCurrentUTCTime());
+        account.setAccountStatus(AccountStatusEnum.CLOSED);
     }
 
     private void validateAccountingGroup(Account account){

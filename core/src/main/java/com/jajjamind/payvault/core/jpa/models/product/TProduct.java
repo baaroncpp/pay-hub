@@ -3,6 +3,7 @@ package com.jajjamind.payvault.core.jpa.models.product;
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
 import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.RootServiceProviderEnum;
 
 import javax.persistence.*;
 
@@ -26,6 +27,7 @@ public class TProduct extends AuditedEntity {
     private Boolean hasCharge;
     private Boolean hasTariff;
     private Boolean hasSmsNotification;
+    private RootServiceProviderEnum rootProvider;
 
 
     @JoinColumn(name = "product_code",referencedColumnName = "code",insertable = false,updatable = false)
@@ -117,5 +119,15 @@ public class TProduct extends AuditedEntity {
 
     public void setHasSmsNotification(Boolean hasSmsNotification) {
         this.hasSmsNotification = hasSmsNotification;
+    }
+
+    @Column(name = "root_provider")
+    @Enumerated(EnumType.STRING)
+    public RootServiceProviderEnum getRootProvider() {
+        return rootProvider;
+    }
+
+    public void setRootProvider(RootServiceProviderEnum rootProvider) {
+        this.rootProvider = rootProvider;
     }
 }

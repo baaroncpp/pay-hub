@@ -3,8 +3,10 @@ package com.jajjamind.payvault.core.service.product;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.api.product.models.ProductCommission;
+import com.jajjamind.payvault.core.jpa.models.product.TProduct;
 import com.jajjamind.payvault.core.jpa.models.product.TProductCommission;
 import com.jajjamind.payvault.core.repository.product.ProductCommissionRepository;
+import com.jajjamind.payvault.core.repository.product.ProductRepository;
 import com.jajjamind.payvault.core.utils.AuditService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class ProductCommissionServiceImpl implements ProductCommissionService, B
     public ProductCommissionRepository productCommissionRepository;
 
     @Autowired
+    public ProductRepository productRepository;
+
+    @Autowired
     public AuditService auditService;
 
     @Override
@@ -33,11 +38,15 @@ public class ProductCommissionServiceImpl implements ProductCommissionService, B
         Validate.notNull(productCommission,"Charge object cannot be null");
         productCommission.validate();
 
+        Optional<TProduct> product = productRepository.findById(productCommission.getProduct().getId());
+        Validate.isPresent(product,ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,productCommission.getProduct().getId());
+
         List<TProductCommission> tariffs = productCommissionRepository.findTariffChargeByGroupIdentifier(productCommission.getTariffGroupIdentifier());
         verifyThatTariffWithinRange(productCommission,tariffs);
 
         TProductCommission tProductCommission = new TProductCommission();
         BeanUtils.copyProperties(productCommission,tProductCommission);
+        tProductCommission.setProduct(product.get());
 
         auditService.stampAuditedEntity(tProductCommission);
         productCommissionRepository.save(tProductCommission);

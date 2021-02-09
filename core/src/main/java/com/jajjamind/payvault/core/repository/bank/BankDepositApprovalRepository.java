@@ -16,6 +16,6 @@ import java.util.Optional;
 @Repository
 public interface BankDepositApprovalRepository extends CrudRepository<TBankDepositApproval,Long> {
 
-    @Query("Select u from TBankDepositApproval u inner join fetch u.bankDeposit inner join fetch u.bankDeposit.bank where u.id = :id")
+    @Query("Select u,t from TBankDepositApproval u inner join fetch u.bankDeposit t inner join fetch t.bank where u.id = :id")
     Optional<TBankDepositApproval> findBankDepositWithBankDetails(@Param("id") Long id);
 }

@@ -16,9 +16,11 @@ public class TAccountMapping extends AuditedEntity{
 
     private Integer bankId;
     private Long agentId;
+    private Long agentIdCommission;
     private Integer productId;
     private TAccount accountId;
     private StatusEnum status;
+    private Boolean systemAccount;
 
     @Column(name = "bank_id")
     public Integer getBankId() {
@@ -65,5 +67,23 @@ public class TAccountMapping extends AuditedEntity{
 
     public void setStatus(StatusEnum status) {
         this.status = status;
+    }
+
+    @Column(name = "system_account")
+    public Boolean getSystemAccount() {
+        return systemAccount;
+    }
+
+    public void setSystemAccount(Boolean systemAccount) {
+        this.systemAccount = systemAccount;
+    }
+
+    @Column(name = "agent_id_commission")
+    public Long getAgentIdCommission() {
+        return agentIdCommission;
+    }
+
+    public void setAgentIdCommission(Long agentIdCommission) {
+        this.agentIdCommission = agentIdCommission;
     }
 }

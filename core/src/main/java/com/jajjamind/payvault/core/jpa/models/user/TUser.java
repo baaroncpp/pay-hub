@@ -20,6 +20,7 @@ public class TUser extends BaseEntityLong implements Serializable {
     private boolean accountExpired;
     private boolean credentialExpired;
     private boolean approved;
+    private boolean initialPasswordReset;
     private TUserAuthority userAuthority;
     private transient TUserMeta userMeta;
     private Boolean isDeleted;
@@ -116,5 +117,14 @@ public class TUser extends BaseEntityLong implements Serializable {
 
     public void setApprovedBy(Long approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    @Column(name = "initial_password_reset")
+    public boolean isInitialPasswordReset() {
+        return initialPasswordReset;
+    }
+
+    public void setInitialPasswordReset(boolean initialPasswordReset) {
+        this.initialPasswordReset = initialPasswordReset;
     }
 }

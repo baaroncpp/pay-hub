@@ -21,10 +21,14 @@ public abstract  class BasePricing {
     private Long id;
     private String name;
     private BigDecimal amount;
+    private BigDecimal systemAmount;
     private Float chargePercent;
+    private Float systemChargePercent;
     private PricingTypeEnum pricingType;
     private BigDecimal fromAmount;
     private BigDecimal toAmount;
+    private BigDecimal tariff;
+    private BigDecimal systemTariff;
     private String tariffGroupIdentifier;
     private String note;
     private StatusEnum status;

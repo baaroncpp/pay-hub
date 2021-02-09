@@ -16,7 +16,7 @@ public class TAgentProduct extends BaseEntityLong {
 
     private TProduct product;
     private Boolean nonActive;
-    private TAgent agentId;
+    private TAgent agent;
 
     @JoinColumn(name = "product_code",referencedColumnName = "product_code",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
@@ -39,11 +39,11 @@ public class TAgentProduct extends BaseEntityLong {
 
     @JoinColumn(name = "agent_id",referencedColumnName = "id",insertable = false,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
-    public TAgent getAgentId() {
-        return agentId;
+    public TAgent getAgent() {
+        return agent;
     }
 
-    public void setAgentId(TAgent agentId) {
-        this.agentId = agentId;
+    public void setAgent(TAgent agent) {
+        this.agent = agent;
     }
 }

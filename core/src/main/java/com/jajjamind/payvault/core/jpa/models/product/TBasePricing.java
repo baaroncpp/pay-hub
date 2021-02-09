@@ -16,6 +16,7 @@ public class TBasePricing extends AuditedEntity {
 
     private BigDecimal fromAmount;
     private BigDecimal toAmount;
+    private BigDecimal tariff;
     private String tariffGroupIdentifier;
     private String name;
     private String note;
@@ -63,5 +64,14 @@ public class TBasePricing extends AuditedEntity {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Column(name = "tariff")
+    public BigDecimal getTariff() {
+        return tariff;
+    }
+
+    public void setTariff(BigDecimal tariff) {
+        this.tariff = tariff;
     }
 }

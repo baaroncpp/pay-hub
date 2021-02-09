@@ -20,7 +20,7 @@ public class LoggedInUser implements UserDetails, Serializable {
 
 
     @Getter
-    private long id;
+    private Long id;
     private String password;
     private String username;
     private boolean accountNonExpired;

@@ -1,6 +1,6 @@
 package com.payhub.interswitch.service.imp;
 
-import java.com.jajjamind.commons.utils.UUIDUtil;
+import com.jajjamind.commons.utils.UUIDUtil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;

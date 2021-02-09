@@ -21,6 +21,7 @@ import com.jajjamind.payvault.core.repository.bank.BankDepositApprovalRepository
 import com.jajjamind.payvault.core.repository.bank.BankDepositRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.Money;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -203,7 +204,7 @@ public class BankDepositServiceImpl implements BankDepositService{
         Validate.isPresent(accountToUpdate,ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND);
 
         final TAccount account = accountToUpdate.get();
-        account.setAvailableBalance(account.getAvailableBalance().add(amountToTopUp));
+        account.setAvailableBalance((Money) account.getAvailableBalance().add(amountToTopUp));
 
         auditService.stampAuditedEntity(account);
         systemAccountRepository.save(account);

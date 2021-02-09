@@ -9,4 +9,7 @@ import com.jajjamind.payvault.core.service.BaseApiService;
  * 03:23
  **/
 public interface ProductService extends BaseApiService<Product> {
+
+    void deactivateProduct(Long id);
+    void activateProduct(Long id);
 }

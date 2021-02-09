@@ -18,6 +18,8 @@ public class ErrorMessageConstants {
     public static final String ACCOUNT_ALREADY_ASSIGNED = "Account with ID %s is already assigned to another product";
     public static final String ACCOUNT_NOT_ASSIGNED_TO_ANY_ENTITY = "Account with id %s not assigned to any entity";
     public static final String PRODUCT_WITH_ID_NOT_FOUND = "Product with ID %s not found";
+    public static final String PRODUCT_REQUEST_FAILED = "Product requested could not be found in the system";
+    public static final String PRODUCT_REQUEST_FAILED_NOT_ACTIVE = "Request could not be processed. Product is currently disabled";
     public static final String CURRENCY_CANNOT_BE_NULL = "Currency cannot be empty";
     public static final String AGENT_DETAILS_IS_REQUIRED = "Agent details is required";
     public static final String COUNTRY_PROVIDED_DOES_NOT_FOUND = "Country with code %s could not be found";
@@ -33,5 +35,9 @@ public class ErrorMessageConstants {
     public static final String INSUFFICIENT_FUNDS_ON_ACCOUNT = "Insufficient balance on account for transaction";
     public static final String NO_PENDING_APPROVAL_FOUND = "There is no request pending approval";
     public static final String APPROVAL_STATUS_UNKNOWN = "Unknown approval option received";
+    public static final String PRODUCT_COMMISSION_PRODUCT_REQUIRED = "A product is required for the commission being created";
+    public static final String NO_PRODUCT_ACCESS = "You do not have access to this product. Please contact support";
+    public static final String COMMISSION_ACCOUNT_REQUIRED = "Account provided must be a commission account";
+    public static final String AGENT_ACCOUNT_NOT_FOUND = "Agent account could not be found in the system. Please contact support";
 
 }

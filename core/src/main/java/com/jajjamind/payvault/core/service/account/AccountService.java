@@ -25,4 +25,8 @@ public interface AccountService {
     List<AccountingGroup> getAllAccountingGroup();
     AccountingGroup getAccountingGroupById(Long id);
     List<Account> getAccountsByGroup(Long id);
+    void linkAgentCommissionAccount(Long agentId,Long accountId);
+    void linkSystemCommissionAccount(Long accountId);
+    void unlinkAgentCommissionAccount(Long accountId,Long agentId);
+    void unlinkSystemCommissionAccount(Long accountId);
 }

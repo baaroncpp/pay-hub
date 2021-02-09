@@ -20,4 +20,5 @@ public interface UserService extends BaseApiService<User> {
     Boolean rejectUser(Long id);
     Boolean approveUser(Long id);
 
+    void resetPassword(String oldPassword, String newPassword);
 }

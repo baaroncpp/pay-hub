@@ -7,6 +7,7 @@ import com.jajjamind.payvault.core.api.product.models.Product;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
+import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 import com.jajjamind.payvault.core.jpa.models.product.TProduct;
 import com.jajjamind.payvault.core.repository.account.AccountRepository;
 import com.jajjamind.payvault.core.repository.product.ProductRepository;
@@ -51,6 +52,7 @@ public class ProductServiceImpl  implements ProductService{
 
         TProduct tProduct = new TProduct();
         BeanUtils.copyProperties(product,tProduct);
+        tProduct.setNonActive(Boolean.TRUE);
 
         tProduct.setProductAccount(account.get());
 
@@ -92,8 +94,15 @@ public class ProductServiceImpl  implements ProductService{
         Validate.notNull(product.getId(),"Product ID to update cannot be null");
 
         Optional<TProduct> oProduct = productRepository.findById(product.getId());
-
         Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,product.getId());
+
+        if(product.getStatus().equals(StatusEnum.ACTIVE)){
+            Optional<TProduct> anyOtherProduct = productRepository.findNotMatchingIdByCategoryAndActive(product.getProductCategory().name(),
+                    product.getRootProvider().name(),
+                    oProduct.get().getId());
+
+            Validate.isTrue(!anyOtherProduct.isPresent(),"There is already an active product with the same root provider");
+        }
 
         TProduct savedProduct = oProduct.get();
 
@@ -149,6 +158,43 @@ public class ProductServiceImpl  implements ProductService{
     @Override
     public Product delete(Long id) {
         return null;
+    }
+
+    @Override
+    public void deactivateProduct(Long id) {
+        Optional<TProduct> oProduct = productRepository.findById(id);
+
+        Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id);
+        TProduct product = oProduct.get();
+        Validate.isTrue(product.getNonActive(),"Product is already de-activated");
+
+        product.setNonActive(Boolean.TRUE);
+
+        auditService.stampAuditedEntity(product);
+        productRepository.save(product);
+
+
+    }
+
+    @Override
+    public void activateProduct(Long id) {
+        Optional<TProduct> oProduct = productRepository.findById(id);
+
+        Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id);
+        TProduct product = oProduct.get();
+        Validate.isTrue(!product.getNonActive(),"Product is already activated");
+
+        Optional<TProduct> anyOtherProduct = productRepository.findNotMatchingIdByCategoryAndActive(product.getProductCategory().name(),
+                product.getRootProvider().name(),
+                id);
+
+        Validate.isTrue(!anyOtherProduct.isPresent(),"There is already an active product with the same root provider");
+
+        product.setNonActive(Boolean.FALSE);
+        auditService.stampAuditedEntity(product);
+
+        productRepository.save(product);
+
     }
 
     @Override

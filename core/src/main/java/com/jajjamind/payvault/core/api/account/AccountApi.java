@@ -5,7 +5,6 @@ import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
 import com.jajjamind.payvault.core.service.account.AccountService;
-import org.codehaus.jackson.map.Serializers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -3,7 +3,7 @@ package com.jajjamind.payvault.core.jpa.models.user;
 import com.jajjamind.payvault.core.jpa.models.BaseEntityLong;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -14,7 +14,7 @@ public class TUserPreviousPassword extends BaseEntityLong {
 
     private TUser user;
     private String pin;
-    private LocalDateTime removalTime;
+    private Date removalTime;
     private String note;
 
     @JoinColumn(name = "user_id",referencedColumnName = "id",insertable = false,updatable = false)
@@ -38,11 +38,11 @@ public class TUserPreviousPassword extends BaseEntityLong {
 
     @Column(name = "removal_time")
     @Temporal(TemporalType.TIMESTAMP)
-    public LocalDateTime getRemovalTime() {
+    public Date getRemovalTime() {
         return removalTime;
     }
 
-    public void setRemovalTime(LocalDateTime removalTime) {
+    public void setRemovalTime(Date removalTime) {
         this.removalTime = removalTime;
     }
 

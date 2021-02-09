@@ -62,4 +62,7 @@ public class TConfiguration extends AuditedEntity {
         return countryCode;
     }
 
+    public void setCountryCode(TCountry countryCode) {
+        this.countryCode = countryCode;
+    }
 }
