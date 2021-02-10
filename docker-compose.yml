@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+
+  app:
+    environment:
+      PV_ENV: ${PV_ENV}
+      PV_DB_USERNAME: ${PV_DB_USERNAME}
+      PV_DB_PASSWORD: ${PV_DB_PASSWORD}
+      PV_DB_HOST: ${PV_DB_HOST}
+      PV_DB_PORT: ${PV_DB_PORT}
+      PV_DB: ${PV_DB}
+      PV_JWT_KEY: ${PV_JWT_KEY}
+      PV_JWT_PASSWORD: ${PV_JWT_PASSWORD}
+      PV_JWT_ALIAS: ${PV_JWT_ALIAS}
+      PV_JWT_CERT: ${PV_JWT_CERT}
+      PV_SERVICE_PORT: ${PV_SERVICE_PORT}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "${PV_SERVICE_PORT}:${PV_SERVICE_PORT}"
+
