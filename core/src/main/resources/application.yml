@@ -54,5 +54,5 @@ springdoc:
       clientSecret: secret
   oAuthFlow:
     password:
-      tokenUrl: http://localhost:9005/oauth/token
-      refreshUrl: http://localhost:9005/oauth/refresh
+      tokenUrl: ${PV_TOKEN_URL}
+      refreshUrl: ${PV_TOKEN_REFRESH}
