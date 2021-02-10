@@ -1,7 +1,9 @@
 package com.jajjamind.payvault.core.api.users.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jajjamind.commons.utils.Validate;
 
 import java.util.function.Predicate;
@@ -13,13 +15,13 @@ import java.util.stream.Stream;
  * 03:38
  **/
 @lombok.Data
-@JsonIgnoreProperties(value = {"password"},allowGetters = true, ignoreUnknown = true)
+@JsonIgnoreProperties( ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
     private Long id;
     private String username;
-    private String password;
+    private String newPassword;
     private Boolean accountLocked;
     private Boolean accountExpired;
     private Boolean credentialExpired;
@@ -29,13 +31,15 @@ public class User {
 
     public void validate(){
         Validate.notEmpty(username,"Username cannot be empty");
-        validatePassword(this.password);
+
+        validatePassword(this.newPassword);
         Validate.notNull(termsOfUse,"User must accept the terms of service while being registered");
         Validate.notNull(termsOfUse.getId(),"Invalid terms of service provided");
         this.userMeta.validate();
     }
 
     public void validatePassword(String password){
+        Validate.notEmpty(password,"Password cannot be empty");
         final Predicate<String> rule1 = s -> s.length() >= 6 && s.length() <= 50;
         final Predicate<String> rule2a = s -> !s.equals(s.toLowerCase());
         final Predicate<String> rule2b = s -> !s.equals(s.toUpperCase());

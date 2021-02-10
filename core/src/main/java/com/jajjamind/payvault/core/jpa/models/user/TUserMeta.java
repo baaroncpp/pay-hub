@@ -6,7 +6,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.GenderEnum;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -27,7 +27,7 @@ public class TUserMeta extends AuditedEntity {
     private String imagePath;
     private String displayName;
     private GenderEnum gender;
-    private LocalDateTime birthDate;
+    private Date birthDate;
     private String email;
     private TCountry countryCode;
     private String identification;
@@ -130,11 +130,11 @@ public class TUserMeta extends AuditedEntity {
     }
 
     @Column(name = "birth_date")
-    public LocalDateTime  getBirthDate() {
+    public Date  getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDateTime birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -147,7 +147,7 @@ public class TUserMeta extends AuditedEntity {
         this.email = email;
     }
 
-    @JoinColumn(name = "country_id",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "country_id",referencedColumnName = "id",insertable = true,updatable = true)
     @OneToOne(fetch = FetchType.EAGER)
     public TCountry getCountryCode() {
         return countryCode;

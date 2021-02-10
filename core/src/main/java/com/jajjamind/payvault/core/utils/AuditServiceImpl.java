@@ -70,7 +70,7 @@ public class AuditServiceImpl implements AuditService{
             Map<String,?> decoded = (LinkedHashMap)( (OAuth2AuthenticationDetails)authentication.getDetails()).getDecodedDetails();
             LoggedInUser user = new LoggedInUser();
             user.setUsername((String)decoded.get("username"));
-            user.setId((Integer)decoded.get("id"));
+            user.setId(Long.valueOf((Integer) decoded.get("id")));
             return user;
         }
 

@@ -21,7 +21,7 @@ public class UserMeta {
     private String firstName;
     private String lastName;
     private String middleName;
-    private Integer userId;
+    private Long userId;
     private Long agentId;
     private String phoneNumber;
     private String phoneNumber2;

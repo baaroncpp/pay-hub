@@ -8,13 +8,11 @@ import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.api.users.models.User;
 import com.jajjamind.payvault.core.api.users.models.UserAuthority;
 import com.jajjamind.payvault.core.api.users.models.UserMeta;
+import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 import com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions;
 import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
-import com.jajjamind.payvault.core.jpa.models.user.TUser;
-import com.jajjamind.payvault.core.jpa.models.user.TUserApproval;
-import com.jajjamind.payvault.core.jpa.models.user.TUserMeta;
-import com.jajjamind.payvault.core.jpa.models.user.TUserPreviousPassword;
+import com.jajjamind.payvault.core.jpa.models.user.*;
 import com.jajjamind.payvault.core.repository.agent.CountryRepository;
 import com.jajjamind.payvault.core.repository.agent.TermsAndConditionsRepository;
 import com.jajjamind.payvault.core.repository.security.UserRepository;
@@ -23,11 +21,13 @@ import com.jajjamind.payvault.core.repository.user.UserMetaRepository;
 import com.jajjamind.payvault.core.repository.user.UserPreviousPasswordRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserPreviousPasswordRepository previousPasswordRepository;
 
+    @Autowired
+    public JooqUserRepository jooqUserRepository;
+
 
     @Transactional
     @Override
@@ -89,7 +92,9 @@ public class UserServiceImpl implements UserService {
         final UserMeta requestMeta = user.getUserMeta();
 
         final TUserMeta tUserMeta = new TUserMeta();
-        BeanUtils.copyProperties(requestMeta,tUserMeta);
+
+
+        BeanUtilsCustom.copyProperties(requestMeta, tUserMeta);
 
         final TTermsAndConditions termsAndConditions = new TTermsAndConditions();
         termsAndConditions.setId(
@@ -98,6 +103,7 @@ public class UserServiceImpl implements UserService {
         tUserMeta.setTTermsAndConditions(termsAndConditions);
         tUserMeta.setUserId(tNewUser.getId());
         tUserMeta.setCountryCode(country.get());
+        tUserMeta.setAgentId(null);
 
         auditService.stampAuditedEntity(tUserMeta);
         userMetaRepository.save(tUserMeta);
@@ -117,11 +123,12 @@ public class UserServiceImpl implements UserService {
     private TUser getTUserFromUserObject(User user){
         final TUser tUser = new TUser();
         tUser.setUsername(user.getUsername());
-        tUser.setUsername(passwordEncoder.encode(user.getPassword()));
+        tUser.setPassword(passwordEncoder.encode(user.getNewPassword()));
         tUser.setAccountExpired(Boolean.FALSE);
         tUser.setAccountLocked(Boolean.FALSE);
         tUser.setCredentialExpired(Boolean.FALSE);
         tUser.setApproved(Boolean.FALSE);
+        tUser.setDeleted(Boolean.FALSE);
 
         return tUser;
     }
@@ -130,7 +137,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User get(Long id) {
 
-        Optional<TUser> toUser = userRepository.findUserById(id.intValue());
+        Optional<TUser> toUser = userRepository.findUserById(id);
         Validate.isTrue(toUser.isPresent(),ErrorMessageConstants.USER_WITH_ID_NOT_FOUND,id);
 
         return  getUserObjectFromTUser(toUser.get());
@@ -163,7 +170,7 @@ public class UserServiceImpl implements UserService {
         user.validate();
         Validate.notNull(user.getId(),"User id to update cannot be null");
 
-        Optional<TUser> userToUpdate = userRepository.findUserById(user.getId().intValue());
+        Optional<TUser> userToUpdate = userRepository.findUserById(user.getId());
 
         Validate.isTrue(userToUpdate.isPresent(),ErrorMessageConstants.USER_WITH_ID_NOT_FOUND,user.getId());
 
@@ -203,7 +210,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User delete(Long id) {
 
-        Optional<TUser> userToUpdate = userRepository.findUserById(id.intValue());
+        Optional<TUser> userToUpdate = userRepository.findUserById(id);
 
         Validate.isTrue(userToUpdate.isPresent(),ErrorMessageConstants.USER_WITH_ID_NOT_FOUND,id);
 
@@ -242,7 +249,7 @@ public class UserServiceImpl implements UserService {
         List<UserMeta> userMetaList = new ArrayList<>();
         pendingApproval.forEach(t -> {
             UserMeta userMeta = new UserMeta();
-            BeanUtils.copyProperties(t,userMeta);
+            BeanUtilsCustom.copyProperties(t,userMeta);
 
             userMetaList.add(userMeta);
         });
@@ -251,11 +258,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean rejectUser(Long id) {
+    public void rejectUser(Long id) {
 
         final TUserApproval userApproval = getPendingUserApproval(id);
 
-        final TUser user = getUserForApproval(userApproval.getUserId().intValue());
+        final TUser user = getUserForApproval(userApproval.getUserId());
 
         userApproval.setStatus(ApprovalEnum.REJECTED);
         auditService.stampAuditedEntity(userApproval);
@@ -264,6 +271,7 @@ public class UserServiceImpl implements UserService {
 
         user.setApproved(Boolean.FALSE);
         user.setDeleted(Boolean.TRUE);
+        user.setUsername(user.getUsername()+"_"+user.getId()+"_reject");
 
         LoggedInUser checker = auditService.getLoggedInUser();
         user.setApprovedBy(checker.getId());
@@ -271,17 +279,15 @@ public class UserServiceImpl implements UserService {
         auditService.stampLongEntity(user);
         userRepository.save(user);
 
-
-        return Boolean.TRUE;
     }
 
     @Transactional
     @Override
-    public Boolean approveUser(Long id) {
+    public void approveUser(Long id) {
 
         final TUserApproval userApproval = getPendingUserApproval(id);
 
-        final TUser user = getUserForApproval(userApproval.getUserId().intValue());
+        final TUser user = getUserForApproval(userApproval.getUserId());
 
         userApproval.setStatus(ApprovalEnum.APPROVED);
         auditService.stampAuditedEntity(userApproval);
@@ -296,24 +302,27 @@ public class UserServiceImpl implements UserService {
         auditService.stampLongEntity(user);
         userRepository.save(user);
 
-        return Boolean.TRUE;
     }
 
+    @Transactional
     @Override
     public void resetPassword(String oldPassword, String newPassword) {
+        User tuser = new User();
+        tuser.validatePassword(newPassword);
         LoggedInUser user = auditService.getLoggedInUser();
         Validate.notNull(user,"Failed to locate user");
 
-        Optional<TUser> userOptional = userRepository.findUserById(user.getId().intValue());
+        Optional<TUser> userOptional = userRepository.findUserById(user.getId());
         Validate.isPresent(userOptional,"No valid system user found");
 
         TUser mUser = userOptional.get();
         Validate.isTrue(mUser.isApproved(),"User is not approved for system access");
         Validate.isTrue(!mUser.isAccountExpired(),"User account has expired");
-        Validate.isTrue(mUser.getDeleted(),"Account with does not exist");
-        Validate.isTrue(mUser.isAccountLocked(),"Account has been locked");
+        Validate.isTrue(!mUser.getDeleted(),"Account with does not exist");
+        Validate.isTrue(!mUser.isAccountLocked(),"Account has been locked");
 
         if(passwordEncoder.matches(oldPassword,mUser.getPassword())){
+            final String oldPasswordToSave = mUser.getPassword();
             mUser.setPassword(passwordEncoder.encode(newPassword));
             mUser.setInitialPasswordReset(Boolean.TRUE);
 
@@ -321,6 +330,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(mUser);
 
             TUserPreviousPassword previousPassword = new TUserPreviousPassword();
+            previousPassword.setPassword(oldPasswordToSave);
             previousPassword.setUser(mUser);
             previousPassword.setNote("Password Reset");
             previousPassword.setRemovalTime(DateTimeUtil.getCurrentUTCTime());
@@ -332,9 +342,18 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public RecordList queryForUsers(MultiValueMap map) {
+        if(!map.containsKey(JooqUserRepository.FIELD_APPROVED)){
+            map.put(JooqUserRepository.FIELD_APPROVED,"YES");
+        }
+
+        return jooqUserRepository.listAndCount(map);
+    }
+
 
     private TUserApproval getPendingUserApproval(Long id){
-        Optional<TUserApproval> approval = userApprovalRepository.findById(id);
+        Optional<TUserApproval> approval = userApprovalRepository.findByUserIdForApproval(id);
 
         Validate.isTrue(approval.isPresent(),"No pending approval found for user");
         final TUserApproval userApproval = approval.get();
@@ -344,7 +363,7 @@ public class UserServiceImpl implements UserService {
         return userApproval;
     }
 
-    private TUser getUserForApproval(int id){
+    private TUser getUserForApproval(Long id){
         Optional<TUser> pendingApproval = userRepository.findUserById(id);
         Validate.isTrue(pendingApproval.isPresent(),"User details with id %s not found",id);
 

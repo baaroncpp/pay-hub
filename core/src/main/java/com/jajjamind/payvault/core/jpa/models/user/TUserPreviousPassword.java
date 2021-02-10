@@ -10,14 +10,16 @@ import java.util.Date;
  * 13/12/2020
  * 13:26
  **/
+@Entity
+@Table(name = "t_user_previous_password", schema = "core")
 public class TUserPreviousPassword extends BaseEntityLong {
 
     private TUser user;
-    private String pin;
+    private String password;
     private Date removalTime;
     private String note;
 
-    @JoinColumn(name = "user_id",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "user_id",referencedColumnName = "id",insertable = true,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getUser() {
         return user;
@@ -27,13 +29,13 @@ public class TUserPreviousPassword extends BaseEntityLong {
         this.user = user;
     }
 
-    @Column(name = "pin")
-    public String getPin() {
-        return pin;
+    @Column(name = "password")
+    public String getPassword() {
+        return password;
     }
 
-    public void setPin(String pin) {
-        this.pin = pin;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Column(name = "removal_time")
