@@ -4,6 +4,6 @@ LABEL maintainer="starnapho@gmail.com"
 LABEL version="1.0"
 LABEL description="Pay Hub"
 
-COPY ./target/*.jar app.jar
+COPY ./core/build/libs/*.jar app.jar
 RUN bash -c 'touch /app.jar'
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
