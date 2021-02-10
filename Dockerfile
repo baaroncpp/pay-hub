@@ -1,4 +1,4 @@
-FROM openjdk:13-ea-16-jdk-alpine3.9
+FROM openjdk:11-ea-13-jre
 
 LABEL maintainer="starnapho@gmail.com"
 LABEL version="1.0"
