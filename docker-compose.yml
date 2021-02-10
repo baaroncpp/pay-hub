@@ -15,6 +15,8 @@ services:
       PV_JWT_ALIAS: ${PV_JWT_ALIAS}
       PV_JWT_CERT: ${PV_JWT_CERT}
       PV_SERVICE_PORT: ${PV_SERVICE_PORT}
+      PV_TOKEN_URL: ${PV_TOKEN_URL}
+      PV_TOKEN_REFRESH: ${PV_TOKEN_REFRESH}
     restart: always
     build:
       context: .
