@@ -25,7 +25,7 @@ public class TAccount extends AuditedEntity {
     private TAccountGrouping accountGrouping;
     private BigDecimal balanceToNotifyAt;
     private Date balanceNotificationSentOn;
-    private Money availableBalance;
+    private BigDecimal availableBalance;
     private AccountStatusEnum accountStatus;
     private String statusDescription;
     private Date activateOn;
@@ -94,11 +94,11 @@ public class TAccount extends AuditedEntity {
     }
 
     @Column(name = "available_balance")
-    public Money getAvailableBalance() {
+    public BigDecimal getAvailableBalance() {
         return availableBalance;
     }
 
-    public void setAvailableBalance(Money availableBalance) {
+    public void setAvailableBalance(BigDecimal availableBalance) {
         this.availableBalance = availableBalance;
     }
 

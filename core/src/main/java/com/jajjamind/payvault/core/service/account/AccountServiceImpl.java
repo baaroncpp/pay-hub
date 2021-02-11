@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
         final Date creationDate = DateTimeUtil.getCurrentUTCTime();
         tAccount.setBalanceNotificationSentOn(creationDate);
         tAccount.setCreatedOn(creationDate);
-        tAccount.setAvailableBalance(new Money(0));
+        tAccount.setAvailableBalance(BigDecimal.ZERO);
         tAccount.setAccountStatus(AccountStatusEnum.NOT_ACTIVE);
         tAccount.setStatusDescription(AccountStatusEnum.NOT_ACTIVE.getDescription());
         tAccount.setAssigned(Boolean.FALSE);

@@ -50,8 +50,7 @@ public abstract class BaseTestClass {
                 .put("client_secret","secret")
                 .build();
 
-        Response response = RestAssured.given(spec).log().all().queryParams(queryParams).post("oauth/token");
-        response.prettyPrint();
+        Response response = RestAssured.given(spec).queryParams(queryParams).post("oauth/token");
 
         Assertions.assertThat(response.getStatusCode())
                 .isEqualTo(200);

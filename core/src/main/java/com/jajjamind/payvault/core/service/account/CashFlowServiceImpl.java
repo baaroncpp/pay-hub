@@ -248,8 +248,8 @@ public class CashFlowServiceImpl implements CashFlowService {
             AccountUtilities.checkThatAccountCanTransact(fromAccount,AccountTypeEnum.MAIN);
             AccountUtilities.checkThatTransactionWontResultInNegativeBalance(fromAccount,request.getAmount());
 
-            final Money balanceBefore = fromAccount.getAvailableBalance();
-            final Money balanceAfter = (Money)balanceBefore.subtract(request.getAmount());
+            final BigDecimal balanceBefore = fromAccount.getAvailableBalance();
+            final BigDecimal balanceAfter =  balanceBefore.subtract(request.getAmount());
             fromAccount.setAvailableBalance(balanceAfter);
             Date  date = DateTimeUtil.getCurrentUTCTime();
             auditService.stampAuditedEntity(fromAccount);
@@ -438,15 +438,15 @@ public class CashFlowServiceImpl implements CashFlowService {
         AccountUtilities.checkThatAccountCanTransact(fromAccount,fromAccountType);
         AccountUtilities.checkThatTransactionWontResultInNegativeBalance(fromAccount,requestedAmount);
 
-        final Money currentFromAccountBalance = fromAccount.getAvailableBalance();
-        final Money finalFromAccountBalance = (Money)fromAccount.getAvailableBalance().subtract(requestedAmount);
+        final BigDecimal currentFromAccountBalance = fromAccount.getAvailableBalance();
+        final BigDecimal finalFromAccountBalance = fromAccount.getAvailableBalance().subtract(requestedAmount);
 
         fromAccount.setAvailableBalance(finalFromAccountBalance);
         auditService.stampAuditedEntity(fromAccount);
         accountRepository.save(fromAccount);
 
-        final Money currentToAccountBalance = toAccount.getAvailableBalance();
-        final Money finalToAccountBalance = (Money)toAccount.getAvailableBalance().add(requestedAmount);
+        final BigDecimal currentToAccountBalance = toAccount.getAvailableBalance();
+        final BigDecimal finalToAccountBalance = toAccount.getAvailableBalance().add(requestedAmount);
 
         toAccount.setAvailableBalance(finalFromAccountBalance);
         auditService.stampAuditedEntity(toAccount);
