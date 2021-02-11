@@ -12,7 +12,7 @@ import javax.persistence.Table;
  * 13:58
  **/
 @Entity
-@Table(name = "t_role",schema = "core")
+@Table(name = "t_roles",schema = "core")
 public class TRole extends BaseEntityInteger {
     private String name;
     private String note;

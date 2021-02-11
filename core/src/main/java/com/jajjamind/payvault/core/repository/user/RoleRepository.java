@@ -15,7 +15,7 @@ import java.util.Optional;
  **/
 public interface RoleRepository extends CrudRepository<TRole,Integer> {
 
-    @Query("Select u from TRole u where u.name in :names")
+    @Query("Select u from TRole u where u.name in (:names)")
     List<TRole> getCountOfRolesThatMatchList(@Param("names") List<String> names);
 
     Optional<TRole> findByName(@Param("name") String name);

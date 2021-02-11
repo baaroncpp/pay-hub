@@ -8,6 +8,7 @@ import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.api.users.models.User;
 import com.jajjamind.payvault.core.api.users.models.UserAuthority;
 import com.jajjamind.payvault.core.api.users.models.UserMeta;
+import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 import com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions;
@@ -250,6 +251,10 @@ public class UserServiceImpl implements UserService {
         pendingApproval.forEach(t -> {
             UserMeta userMeta = new UserMeta();
             BeanUtilsCustom.copyProperties(t,userMeta);
+
+            Country c = new Country();
+            BeanUtilsCustom.copyProperties(t.getCountryCode(),c);
+            userMeta.setCountryCode(c);
 
             userMetaList.add(userMeta);
         });

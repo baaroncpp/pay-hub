@@ -12,7 +12,7 @@ import java.io.Serializable;
  **/
 @Entity
 @Table(name = "t_authority",schema = "core")
-public class TUserAuthority implements Serializable {
+public class TUserAuthority  implements Serializable {
 
     private Integer id;
     private String username;
@@ -37,7 +37,7 @@ public class TUserAuthority implements Serializable {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

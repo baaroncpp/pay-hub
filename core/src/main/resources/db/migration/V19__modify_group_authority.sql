@@ -1,0 +1,1 @@
+ALTER TABLE core.t_group_authority ALTER COLUMN authority TYPE TEXT;

@@ -15,8 +15,10 @@ public interface RolesService {
     Group addGroupAuthority(Group groupAuthority);
     Group getGroupAuthorityByName(String name);
     List<Role> getAllRolesAssignable();
-    Role assignRoleToUser(Role role,Long userId);
+    Role assignRoleToUser(String roleName,Long userId);
+    void unAssignRoleFromUser(String roleName,Long userId);
     Group updateGroupAuthority(Group groupAuthority);
-    Group assignUserToGroup(Group group,Long userId);
-    Void unAssignUserFromGroup(Group group, Long userId);
+    void assignUserToGroup(Integer group,Long userId);
+    void unAssignUserFromGroup(Integer group, Long userId);
+    List<Group> getAllGroups();
 }

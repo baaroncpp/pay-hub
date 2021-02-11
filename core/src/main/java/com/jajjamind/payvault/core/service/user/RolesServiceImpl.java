@@ -7,10 +7,13 @@ import com.jajjamind.payvault.core.jpa.models.user.*;
 import com.jajjamind.payvault.core.repository.security.UserRepository;
 import com.jajjamind.payvault.core.repository.user.*;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +57,7 @@ public class RolesServiceImpl implements RolesService{
 
         //CheckThatNog group exists with name
         Optional<TGroup> existing = groupRepository.findByName(groupAuthority.getName());
-        Validate.isTrue(existing.isPresent(),"Group with name %s",groupAuthority.getName());
+        Validate.isTrue(!existing.isPresent(),"Group with name %s",groupAuthority.getName());
 
         //Check that roles exist
         final List<String> roles = groupAuthority.getRoleNames().stream().distinct().collect(Collectors.toList());
@@ -66,6 +69,7 @@ public class RolesServiceImpl implements RolesService{
         group.setName(groupAuthority.getName());
         group.setNote(groupAuthority.getNote());
 
+        auditService.stampIntegerEntity(group);
         groupRepository.save(group);
 
         Optional<TGroup> createdGroup = groupRepository.findByName(groupAuthority.getName());
@@ -73,7 +77,7 @@ public class RolesServiceImpl implements RolesService{
 
 
         final TGroupAuthority tGroupAuthority = new TGroupAuthority();
-        tGroupAuthority.setAuthority(roles.stream().reduce(",",String::concat));
+        tGroupAuthority.setAuthority(StringUtils.collectionToCommaDelimitedString(roles));
         tGroupAuthority.setGroup(createdGroup.get());
 
         groupAuthorityRepository.save(tGroupAuthority);
@@ -105,26 +109,68 @@ public class RolesServiceImpl implements RolesService{
     }
 
     @Override
-    public Role assignRoleToUser(Role role, Long userId) {
+    public Role assignRoleToUser(String roleName, Long userId) {
 
-        Optional<TUser> userOptional = userRepository.findById(userId);
-        Validate.isTrue(userOptional.isPresent(),"User with id %id not found",userId);
+        Optional<TUser> userOptional = userRepository.findUserByIdWithAuthority(userId);
+        Validate.isTrue(userOptional.isPresent(),"User with id %s not found",userId);
 
         final TUser user = userOptional.get();
         validateUserDetailsForRoleAssignment(user);
 
-        Optional<TRole> roleOptional = roleRepository.findByName(role.getName());
-        Validate.isTrue(roleOptional.isPresent(),"Role with name %s does not exist",role.getName());
+        Optional<TRole> roleOptional = roleRepository.findByName(roleName);
+        Validate.isPresent(roleOptional,"Role with name %s does not exist",roleName);
 
-        final TUserAuthority authority = user.getUserAuthority();
-        final List<String> listOfAuthorities = Arrays.asList(authority.getAuthority().split(","));
+        TUserAuthority authority = user.getUserAuthority();
+        if(authority == null){
+            authority = new TUserAuthority();
+        }
 
-        Validate.isTrue(!listOfAuthorities.contains(role.getName()),"User already assigned role %s ",role.getName());
+        if(Strings.isNotEmpty(authority.getAuthority())) {
+            final List<String> listOfAuthorities = Arrays.asList(authority.getAuthority().split(","));
+            Validate.isTrue(!listOfAuthorities.contains(roleName),"User already assigned role %s ",roleName);
 
-        authority.setAuthority(authority.getAuthority().concat(",").concat(role.getName()));
+            authority.setAuthority(authority.getAuthority().concat(",").concat(roleName));
+
+        }else{
+            authority.setAuthority(roleName);
+        }
+
+        if(authority.getId() == null){
+            authority.setUsername(user.getUsername());
+        }
+
         userAuthorityRepository.save(authority);
 
+        final Role role = new Role();
+
+        BeanUtilsCustom.copyProperties(roleOptional.get(),role);
+
         return role;
+
+    }
+
+    @Override
+    public void unAssignRoleFromUser(String roleName, Long userId) {
+        Optional<TUser> userOptional = userRepository.findUserByIdWithAuthority(userId);
+        Validate.isTrue(userOptional.isPresent(),"User with id %s not found",userId);
+
+        final TUser user = userOptional.get();
+        validateUserDetailsForRoleAssignment(user);
+
+        final TUserAuthority authority = user.getUserAuthority();
+        Validate.notEmpty(authority.getAuthority(),"User has no authority assigned");
+
+        final List<String> listOfAuthorities = Arrays.asList(authority.getAuthority().split(","));
+        final List<String> newListOfAuthorities = new ArrayList<>();
+        listOfAuthorities.forEach(t -> {
+            if(!t.equals(roleName))
+                newListOfAuthorities.add(t);
+        });
+
+        authority.setAuthority(StringUtils.collectionToCommaDelimitedString(newListOfAuthorities));
+
+        userAuthorityRepository.save(authority);
+
     }
 
     @Transactional
@@ -144,7 +190,7 @@ public class RolesServiceImpl implements RolesService{
         validateThatRolesToAddExist(roles);
 
         final TGroupAuthority authority = group.getGroupAuthority();
-        authority.setAuthority(roles.stream().reduce(",",String::concat));
+        authority.setAuthority(StringUtils.collectionToCommaDelimitedString(roles));
 
         groupAuthorityRepository.save(authority);
 
@@ -166,13 +212,13 @@ public class RolesServiceImpl implements RolesService{
     }
 
     @Override
-    public Group assignUserToGroup(Group group, Long userId) {
+    public void assignUserToGroup(Integer groupId, Long userId) {
 
-        Validate.notNull(group.getId(),"Group ID is required");
+        Validate.notNull(groupId,"Group ID is required");
         Validate.notNull(userId,"User id is required");
 
-        Optional<TGroup> groupOptional = groupRepository.findById(group.getId());
-        Validate.isTrue(groupOptional.isPresent(),"Group with ID %s does not exist",group.getId());
+        Optional<TGroup> groupOptional = groupRepository.findById(groupId);
+        Validate.isTrue(groupOptional.isPresent(),"Group with ID %s does not exist",groupId);
 
         Optional<TUser> userOptional = userRepository.findById(userId);
         Validate.isTrue(userOptional.isPresent(),"User with ID %s not found",userId);
@@ -187,26 +233,36 @@ public class RolesServiceImpl implements RolesService{
         member.setGroupId(groupOptional.get().getId());
         member.setUsername(user.getUsername());
 
-        auditService.stampIntegerEntity(member);
-
         groupMemberRepository.save(member);
 
-        return group;
     }
 
     @Override
-    public Void unAssignUserFromGroup(Group group, Long userId) {
+    public void unAssignUserFromGroup(Integer groupId, Long userId) {
+
+        Validate.notNull(groupId,"Group ID is required");
+        Validate.notNull(userId,"User id is required");
+
         Optional<TUser> userOptional = userRepository.findById(userId);
         Validate.isTrue(userOptional.isPresent(),"User with ID %s not found",userId);
 
         final TUser user = userOptional.get();
 
-        Optional<TGroupMember> groupMember = groupMemberRepository.findByUsernameAndGroup(user.getUsername(),group.getId());
-        Validate.isTrue(groupMember.isPresent(),"User is not assigned to group with ID %s ",group.getId());
+        Optional<TGroupMember> groupMember = groupMemberRepository.findByUsernameAndGroup(user.getUsername(),groupId);
+        Validate.isTrue(groupMember.isPresent(),"User is not assigned to group with ID %s ",groupId);
 
         groupMemberRepository.delete(groupMember.get());
 
-        return null;
+    }
+
+    @Override
+    public List<Group> getAllGroups() {
+
+        Iterable<TGroup> groupAuthority = groupRepository.findAll();
+
+        List<Group> group = new ArrayList<>();
+        groupAuthority.forEach(t -> group.add(getGroupFromTGroup(t)));
+        return group;
     }
 
     private Group getGroupFromTGroup(TGroup tGroup){
@@ -220,7 +276,7 @@ public class RolesServiceImpl implements RolesService{
         List<Role> list = new ArrayList<>();
         roles.stream().forEach(t -> {
             Role role = new Role();
-            BeanUtils.copyProperties(t,role);
+            BeanUtilsCustom.copyProperties(t,role);
             list.add(role);
         });
 
@@ -233,6 +289,8 @@ public class RolesServiceImpl implements RolesService{
     private void validateUserDetailsForRoleAssignment(TUser user){
         Validate.isTrue(!user.isAccountExpired(),"User account has expired, role cannot be assigned");
         Validate.isTrue(!user.isAccountLocked(),"User account is locked, role cannot be assigned");
+        Validate.isTrue(user.isApproved(),"User account is pending approval");
+        Validate.isTrue(!user.getDeleted(),"No user with given details in system");
     }
 
     private void validateThatRolesToAddExist(List<String> roles){
