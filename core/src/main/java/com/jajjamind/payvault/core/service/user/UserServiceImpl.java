@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -349,7 +350,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public RecordList queryForUsers(MultiValueMap map) {
         if(!map.containsKey(JooqUserRepository.FIELD_APPROVED)){
-            map.put(JooqUserRepository.FIELD_APPROVED,"YES");
+            map.put(JooqUserRepository.FIELD_APPROVED, Arrays.asList("YES"));
         }
 
         return jooqUserRepository.listAndCount(map);
