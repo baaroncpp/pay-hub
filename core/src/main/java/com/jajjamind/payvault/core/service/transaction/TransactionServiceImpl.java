@@ -145,7 +145,7 @@ public class TransactionServiceImpl implements TransactionService{
                 return Optional.of(MutablePair.of(getAmountFromPercentCommission(systemCommission,transactionAmount),
                         getAmountFromPercentCommission(agentCommission,transactionAmount)));
 
-            case FLAG_CHARGE:
+            case FLAT_CHARGE:
                 return Optional.of(MutablePair.of(commission.getSystemAmount(),commission.getAmount()));
 
             default:

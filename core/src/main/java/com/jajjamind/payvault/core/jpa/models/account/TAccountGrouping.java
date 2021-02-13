@@ -1,10 +1,9 @@
 package com.jajjamind.payvault.core.jpa.models.account;
 
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
+import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author akena
@@ -17,6 +16,7 @@ public class TAccountGrouping  extends AuditedEntity {
 
     private String name;
     private String note;
+    private AccountTypeEnum groupType;
     private boolean canBulkLiquidate;
 
     @Column(name = "name")
@@ -44,5 +44,15 @@ public class TAccountGrouping  extends AuditedEntity {
 
     public void setCanBulkLiquidate(boolean canBulkLiquidate) {
         this.canBulkLiquidate = canBulkLiquidate;
+    }
+
+    @Column(name = "group_type")
+    @Enumerated(EnumType.STRING)
+    public AccountTypeEnum getGroupType() {
+        return groupType;
+    }
+
+    public void setGroupType(AccountTypeEnum groupType) {
+        this.groupType = groupType;
     }
 }

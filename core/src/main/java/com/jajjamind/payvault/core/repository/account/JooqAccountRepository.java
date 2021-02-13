@@ -1,6 +1,8 @@
 package com.jajjamind.payvault.core.repository.account;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.repository.JooqFilter;
 import com.jajjamind.payvault.core.repository.QueryResultPicker;
@@ -230,17 +232,23 @@ public class JooqAccountRepository implements QueryResultPicker{
         private String accountType;
         private String accountGrouping;
         private BigDecimal balanceToNotifyAt;
+        @JsonFormat( pattern = DateTimeUtil.YYYY_MM_DD_HH_MM_SS)
         private Date balanceNotificationSentOn;
         private BigDecimal availableBalance;
         private String statusDescription;
         private String accountStatus;
+        @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
         private Date activatedOn;
         private String activatedBy;
+        @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
         private Date suspendedOn;
         private String suspendedBy;
+        @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
         private Date closedOn;
         private String closedBy;
+        @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
         private Date createdOn;
+        @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
         private Date modifiedOn;
         private String createdBy;
         private String modifiedBy;

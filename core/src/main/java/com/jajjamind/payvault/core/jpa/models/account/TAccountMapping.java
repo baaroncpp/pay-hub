@@ -20,7 +20,7 @@ public class TAccountMapping extends AuditedEntity{
     private Integer productId;
     private TAccount accountId;
     private StatusEnum status;
-    private Boolean systemAccount;
+    private Boolean systemAccount = Boolean.FALSE;
 
     @Column(name = "bank_id")
     public Integer getBankId() {
@@ -43,6 +43,7 @@ public class TAccountMapping extends AuditedEntity{
     }
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     public StatusEnum getStatus() {
         return status;
     }
