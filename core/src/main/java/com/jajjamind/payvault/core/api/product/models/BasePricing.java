@@ -1,7 +1,9 @@
 package com.jajjamind.payvault.core.api.product.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
@@ -34,7 +36,9 @@ public abstract  class BasePricing {
     private StatusEnum status;
     private String createdBy;
     private String modifiedBy;
+    @JsonFormat(pattern = DateTimeUtil.YYYY_MM_DD)
     private Date createdOn;
+    @JsonFormat(pattern = DateTimeUtil.YYYY_MM_DD)
     private Date modifiedOn;
 
     public void validate(){
@@ -45,9 +49,10 @@ public abstract  class BasePricing {
             Validate.notNull(toAmount,"Starting amount is required");
             Validate.notNull(fromAmount,"Final amount is required");
             Validate.isTrue(toAmount.compareTo(fromAmount) > 0,"Final amount must be greater than starting amount");
+            Validate.notEmpty(tariffGroupIdentifier,"A group name for the tariffs is required");
         }
 
-        if(pricingType.equals(PricingTypeEnum.FLAG_CHARGE)){
+        if(pricingType.equals(PricingTypeEnum.FLAT_CHARGE)){
             Validate.notNull(amount,"Charge amount is required for flat charges");
         }
 

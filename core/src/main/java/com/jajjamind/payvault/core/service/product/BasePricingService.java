@@ -1,5 +1,6 @@
 package com.jajjamind.payvault.core.service.product;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.api.product.models.BasePricing;
 import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
@@ -21,9 +22,9 @@ public interface BasePricingService<T extends TBasePricing> {
 
             tariff.stream().forEach(t -> {
                 //Check if there is a from value within this limit
-                if((t.getFromAmount().compareTo(charge.getFromAmount()) >= 0 && t.getFromAmount().compareTo(charge.getToAmount()) <= 0)
-                        || (t.getToAmount().compareTo(charge.getFromAmount()) >= 0 && t.getToAmount().compareTo(charge.getToAmount()) <= 0 && !t.getId().equals(charge.getId()))){
-                    throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, ErrorMessageConstants.TARIFF_EXISTS_IN_SYSTEM);
+                if(((t.getFromAmount().compareTo(charge.getFromAmount()) >= 0 && t.getFromAmount().compareTo(charge.getToAmount()) <= 0)
+                        || (t.getToAmount().compareTo(charge.getFromAmount()) >= 0 && t.getToAmount().compareTo(charge.getToAmount()) <= 0)) && !t.getId().equals(charge.getId())){
+                    throw new BadRequestException(ErrorMessageConstants.TARIFF_EXISTS_IN_SYSTEM);
                 }
 
             });

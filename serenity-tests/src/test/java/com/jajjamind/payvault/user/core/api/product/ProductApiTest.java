@@ -31,7 +31,7 @@ public class ProductApiTest extends BaseTestClass {
 
     @Test
     public void testThatCanCreateAndGetProductTemplate() throws JSONException {
-        JSONObject templateObject = ProductPayload.createProductCommissionTemplateWithChargePayload(BigDecimal.valueOf(2300),0, PricingTypeEnum.FLAG_CHARGE.name());
+        JSONObject templateObject = ProductPayload.createProductCommissionTemplateWithChargePayload(BigDecimal.valueOf(2300),0, PricingTypeEnum.FLAT_CHARGE.name());
         productSteps.createProductCommissionTemplate(templateObject.toString())
                 .thenCheckThatProductTemplateCreated()
                 .thenGetProductCommissionTemplateById();

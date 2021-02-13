@@ -1,16 +1,20 @@
 package com.jajjamind.payvault.core.service.product;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.api.product.models.ProductCommissionTemplate;
+import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 import com.jajjamind.payvault.core.jpa.models.product.TProductCommissionTemplate;
 import com.jajjamind.payvault.core.repository.product.ProductCommissionTemplateRepository;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +40,12 @@ public class ProductCommissionTemplateServiceImpl implements ProductCommissionTe
         Validate.notNull(productCommissionTemplate,"Charge object cannot be null");
         productCommissionTemplate.validate();
 
-        List<TProductCommissionTemplate> tariffs = productCommissionTemplateRepository.findTariffChargeByGroupIdentifier(productCommissionTemplate.getTariffGroupIdentifier());
-        verifyThatTariffWithinRange(productCommissionTemplate,tariffs);
+        if(productCommissionTemplate.getPricingType().equals(PricingTypeEnum.TARIFF)) {
+            List<TProductCommissionTemplate> tariffs = productCommissionTemplateRepository.findTariffChargeByGroupIdentifier(productCommissionTemplate.getTariffGroupIdentifier());
+            verifyThatTariffWithinRange(productCommissionTemplate, tariffs);
+        }else{
+            productCommissionTemplate.setTariffGroupIdentifier(null);
+        }
 
         TProductCommissionTemplate commissionTemplate = new TProductCommissionTemplate();
         BeanUtils.copyProperties(productCommissionTemplate,commissionTemplate);
@@ -67,11 +75,11 @@ public class ProductCommissionTemplateServiceImpl implements ProductCommissionTe
         productCommissionTemplate.validate();
         Validate.notNull(productCommissionTemplate.getId(),"Charge Id is required to perform update");
 
-        Optional<TProductCommissionTemplate> productCharge = productCommissionTemplateRepository.findById(productCommissionTemplate.getId());
-        Validate.isTrue(productCharge.isPresent(), ErrorMessageConstants.CHARGE_WITH_ID_NOT_FOUND,String.valueOf(productCommissionTemplate.getId()));
+        TProductCommissionTemplate currentCharge = productCommissionTemplateRepository.findById(productCommissionTemplate.getId())
+                .orElseThrow(() -> new BadRequestException(ErrorMessageConstants.CHARGE_WITH_ID_NOT_FOUND,String.valueOf(productCommissionTemplate.getId())));
+        Validate.isTrue(productCommissionTemplate.getPricingType().equals(currentCharge.getPricingType()),"You cannot change commission types");
 
-        TProductCommissionTemplate currentCharge = productCharge.get();
-        BeanUtils.copyProperties(productCommissionTemplate,currentCharge);
+        BeanUtilsCustom.copyProperties(productCommissionTemplate,currentCharge);
 
         List<TProductCommissionTemplate> tariff = productCommissionTemplateRepository.findTariffChargeByGroupIdentifier(productCommissionTemplate.getTariffGroupIdentifier());
         verifyThatTariffWithinRange(productCommissionTemplate,tariff);
@@ -86,7 +94,14 @@ public class ProductCommissionTemplateServiceImpl implements ProductCommissionTe
 
     @Override
     public ProductCommissionTemplate delete(Long id) {
-        throw new UnsupportedOperationException();
+        final TProductCommissionTemplate currentCharge = productCommissionTemplateRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(ErrorMessageConstants.CHARGE_WITH_ID_NOT_FOUND,String.valueOf(id)));
+
+        currentCharge.setStatus(false);
+        auditService.stampAuditedEntity(currentCharge);
+        productCommissionTemplateRepository.save(currentCharge);
+
+        return getProductCommissionTemplate(currentCharge);
     }
 
     @Override
@@ -110,8 +125,25 @@ public class ProductCommissionTemplateServiceImpl implements ProductCommissionTe
         Validate.isTrue(template.isPresent(),"Failed to find template with name %s",name);
         TProductCommissionTemplate tTemplate = template.get();
 
-
         return getProductCommissionTemplate(tTemplate);
+    }
+
+    @Override
+    public List<ProductCommissionTemplate> getTariffGroup(String groupIdentifier) {
+        List<TProductCommissionTemplate> template = productCommissionTemplateRepository.findTariffChargeByGroupIdentifier(groupIdentifier);
+
+        List<ProductCommissionTemplate> tariffs = new ArrayList<>();
+        template.forEach(t -> {
+            tariffs.add(getProductCommissionTemplate(t));
+        });
+
+        return tariffs;
+    }
+
+    @Transactional
+    @Override
+    public void disableTariffGroup(String groupIdentifier) {
+        productCommissionTemplateRepository.deactivateTariffGroup(groupIdentifier);
     }
 
     private ProductCommissionTemplate getProductCommissionTemplate(TProductCommissionTemplate t){

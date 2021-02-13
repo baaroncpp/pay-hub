@@ -8,7 +8,6 @@ import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.api.users.models.User;
 import com.jajjamind.payvault.core.api.users.models.UserAuthority;
 import com.jajjamind.payvault.core.api.users.models.UserMeta;
-import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 import com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions;
