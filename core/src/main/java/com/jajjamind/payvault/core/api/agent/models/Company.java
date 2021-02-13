@@ -1,9 +1,13 @@
 package com.jajjamind.payvault.core.api.agent.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.jpa.models.enums.IdentificationEnum;
+
+import java.util.Date;
 
 /**
  * @author akena
@@ -31,6 +35,10 @@ public class Company {
     private String email;
     private String formSerial;
     private String note;
+    @JsonFormat(pattern = DateTimeUtil.YYYY_MM_DD_HH_MM_SS)
+    private Date createdOn;
+    @JsonFormat(pattern = DateTimeUtil.YYYY_MM_DD_HH_MM_SS)
+    private Date modifiedOn;
 
     public void validate(){
         Validate.notEmpty(businessName,"Business name is required");

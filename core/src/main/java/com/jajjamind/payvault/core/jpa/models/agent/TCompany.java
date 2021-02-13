@@ -18,7 +18,7 @@ public class TCompany extends AuditedEntity {
     private String natureOfBusiness;
     private String physicalAddress;
     private String phoneNumber;
-    private String district;
+    private TDistrict district;
     private String tinNumber;
     private TCountry registrationCountry;
     private String contactPerson;
@@ -66,12 +66,13 @@ public class TCompany extends AuditedEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    @Column(name = "district")
-    public String getDistrict() {
+    @JoinColumn(name = "district",referencedColumnName = "id",insertable = true,updatable = true)
+    @OneToOne(fetch = FetchType.EAGER)
+    public TDistrict getDistrict() {
         return district;
     }
 
-    public void setDistrict(String district) {
+    public void setDistrict(TDistrict district) {
         this.district = district;
     }
 
@@ -84,8 +85,8 @@ public class TCompany extends AuditedEntity {
         this.tinNumber = tinNumber;
     }
 
-    @JoinColumn(name = "registration_country",referencedColumnName = "id",insertable = false,updatable = false)
-    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registration_country",referencedColumnName = "id",insertable = true,updatable = true)
+    @OneToOne(fetch = FetchType.EAGER)
     public TCountry getRegistrationCountry() {
         return registrationCountry;
     }
