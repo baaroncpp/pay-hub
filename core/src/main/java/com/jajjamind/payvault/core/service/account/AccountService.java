@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.service.account;
 
 import com.jajjamind.payvault.core.api.account.models.Account;
+import com.jajjamind.payvault.core.api.account.models.AccountLink;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
 
@@ -25,8 +26,6 @@ public interface AccountService {
     List<AccountingGroup> getAllAccountingGroup();
     AccountingGroup getAccountingGroupById(Long id);
     List<Account> getAccountsByGroup(Long id);
-    void linkAgentCommissionAccount(Long agentId,Long accountId);
-    void linkSystemCommissionAccount(Long accountId);
-    void unlinkAgentCommissionAccount(Long accountId,Long agentId);
-    void unlinkSystemCommissionAccount(Long accountId);
+    void linkAccount(AccountLink linkType);
+    void unLinkAccount(AccountLink linkType);
 }

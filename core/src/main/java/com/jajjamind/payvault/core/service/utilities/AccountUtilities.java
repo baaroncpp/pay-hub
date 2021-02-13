@@ -25,7 +25,7 @@ public class AccountUtilities {
         Validate.isTrue(!acc.getAssigned(), ErrorMessageConstants.ACCOUNT_ALREADY_ASSIGNED,acc.getId());
         Validate.isTrue(!acc.getAccountStatus().equals(AccountStatusEnum.CLOSED),ErrorMessageConstants.ACCOUNT_IS_CLOSED);
         Validate.isTrue(acc.getAccountStatus().equals(AccountStatusEnum.NOT_ACTIVE),ErrorMessageConstants.ACCOUNT_ALREADY_ASSIGNED,acc.getId());
-        Validate.isTrue(acc.getAvailableBalance().compareTo(BigDecimal.ZERO) > 0,ErrorMessageConstants.ACCOUNT_BALANCE_MUST_BE_ZERO);
+        Validate.isTrue(acc.getAvailableBalance().compareTo(BigDecimal.ZERO) == 0,ErrorMessageConstants.ACCOUNT_BALANCE_MUST_BE_ZERO);
 
     }
 
@@ -37,7 +37,7 @@ public class AccountUtilities {
 
     public static void checkThatAccountCanBeUnAssigned(TAccount account){
         Validate.isTrue(account.getAccountStatus().equals(AccountStatusEnum.ACTIVE),"Account is already not assigned");
-        Validate.isTrue(account.getAvailableBalance().compareTo(BigDecimal.ZERO) > 0, ErrorMessageConstants.ACCOUNT_BALANCE_MUST_BE_ZERO );
+        Validate.isTrue(account.getAvailableBalance().compareTo(BigDecimal.ZERO) == 0, ErrorMessageConstants.ACCOUNT_BALANCE_MUST_BE_ZERO );
     }
 
     public static void checkThatAccountCanTransact(TAccount account,AccountTypeEnum... accountTypeEnum){
@@ -49,6 +49,6 @@ public class AccountUtilities {
     public static void checkThatTransactionWontResultInNegativeBalance(TAccount fromAccount,BigDecimal amountToTransact){
         final BigDecimal fromAccountBalance = fromAccount.getAvailableBalance();
         final BigDecimal newFromAccountBalance = fromAccountBalance.subtract(amountToTransact);
-        Validate.isTrue(newFromAccountBalance.compareTo(BigDecimal.ZERO)>= 0,ErrorMessageConstants.INSUFFICIENT_FUNDS_ON_ACCOUNT);
+        Validate.isTrue(newFromAccountBalance.compareTo(BigDecimal.ZERO) >= 0,ErrorMessageConstants.INSUFFICIENT_FUNDS_ON_ACCOUNT);
     }
 }

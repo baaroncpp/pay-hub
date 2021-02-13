@@ -1,7 +1,9 @@
 package com.jajjamind.payvault.core.api.account.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
@@ -25,18 +27,22 @@ public class Account {
     private AccountTypeEnum accountType;
     private AccountingGroup accountGrouping;
     private BigDecimal balanceToNotifyAt;
+    @JsonFormat( pattern = DateTimeUtil.YYYY_MM_DD_HH_MM_SS)
     private Date balanceNotificationSentOn;
     private BigDecimal availableBalance;
     private AccountStatusEnum accountStatus;
     private String statusDescription;
+    @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
     private Date activatedOn;
     private String activatedBy;
     private Date suspendedOn;
     private String suspendedBy;
+    @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
     private Date closedOn;
     private String closedBy;
     private String createdBy;
     private String modifiedBy;
+    @JsonFormat( pattern = DateTimeUtil.DD_MM_YYYY)
     private Date createdOn;
     private Date modifiedOn;
 

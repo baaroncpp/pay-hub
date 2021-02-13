@@ -4,6 +4,7 @@ import com.jajjamind.commons.text.StringUtil;
 import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.account.models.Account;
+import com.jajjamind.payvault.core.api.account.models.AccountLink;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
@@ -14,6 +15,7 @@ import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
+import com.jajjamind.payvault.core.jpa.models.user.TGroup;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.repository.JooqFilter;
 import com.jajjamind.payvault.core.repository.account.AccountGroupingRepository;
@@ -24,6 +26,7 @@ import com.jajjamind.payvault.core.repository.bank.AccountMappingRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.service.utilities.AccountUtilities;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import com.jajjamind.payvault.core.utils.Money;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,16 +75,20 @@ public class AccountServiceImpl implements AccountService {
         validateAccountingGroup(account);
 
         TAccount tAccount = new TAccount();
-        BeanUtils.copyProperties(account,tAccount);
+        BeanUtilsCustom.copyProperties(account,tAccount);
 
-        TAccountGrouping grouping = null;
+        //Only non main accounts can be grouped
+        if(account.getAccountGrouping() != null && !account.getAccountType().equals(AccountTypeEnum.MAIN)) {
 
-        if(account.getAccountGrouping() != null) {
-            grouping = new TAccountGrouping();
-            grouping.setId(account.getAccountGrouping().getId());
+            Optional<TAccountGrouping> groupingOptional = accountGroupingRepository.findById(account.getAccountGrouping().getId());
+            Validate.isPresent(groupingOptional,"Account grouping provided could not be found");
+
+            final TAccountGrouping group = groupingOptional.get();
+            Validate.isTrue(group.getGroupType().equals(account.getAccountType()),"All accounts need to be of type %s to be added to group %s",group.getGroupType(),group.getName());
+
+            tAccount.setAccountGrouping(group);
         }
 
-        tAccount.setAccountGrouping(grouping);
         tAccount.setCode("000");
 
         final Date creationDate = DateTimeUtil.getCurrentUTCTime();
@@ -102,7 +109,7 @@ public class AccountServiceImpl implements AccountService {
         ca.setCode(generateAccountCode(account.getAccountType(),ca.getId()));
         accountRepository.save(ca);
 
-        BeanUtils.copyProperties(createdAccount.get(),account);
+        BeanUtilsCustom.copyProperties(createdAccount.get(),account);
         account.setCode(ca.getCode());
 
         return account;
@@ -113,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
 
         accountGroup.validate();
         TAccountGrouping group = new TAccountGrouping();
-        BeanUtils.copyProperties(accountGroup,group);
+        BeanUtilsCustom.copyProperties(accountGroup,group);
 
         auditService.stampAuditedEntity(group);
         accountGroupingRepository.save(group);
@@ -121,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
         Optional<TAccountGrouping> created = accountGroupingRepository.findByName(accountGroup.getName());
         Validate.isTrue(created.isPresent(),"Failed to create accounting group");
 
-        BeanUtils.copyProperties(created.get(),accountGroup);
+        BeanUtilsCustom.copyProperties(created.get(),accountGroup);
         return accountGroup;
     }
 
@@ -264,7 +271,7 @@ public class AccountServiceImpl implements AccountService {
         accountGroupingL.forEach(t ->
         {
             AccountingGroup g =new AccountingGroup();
-            BeanUtils.copyProperties(t,g);
+            BeanUtilsCustom.copyProperties(t,g);
             accountingGroups.add(g);
         });
 
@@ -297,7 +304,6 @@ public class AccountServiceImpl implements AccountService {
         return account;
     }
 
-    @Override
     public void linkAgentCommissionAccount(Long agentId, Long accountId) {
 
         Optional<TAccountMapping> accountMappingOptional = accountMappingRepository.findAgentCommissionAccountMapped(agentId);
@@ -345,7 +351,31 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void linkSystemCommissionAccount(Long accountId) {
+    public void linkAccount(AccountLink link) {
+        if (link.getLinkType().equals(AccountLink.LinkType.AGENT)) {
+            linkAgentCommissionAccount(link.getEntityId(),link.getAccountId());
+
+        }else if(link.getLinkType().equals(AccountLink.LinkType.SYSTEM)){
+            linkSystemCommissionAccount(link.getAccountId());
+        }else{
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void unLinkAccount(AccountLink link) {
+        if (link.getLinkType().equals(AccountLink.LinkType.AGENT)) {
+            unlinkAgentCommissionAccount(link.getEntityId(),link.getAccountId());
+
+        }else if(link.getLinkType().equals(AccountLink.LinkType.SYSTEM)){
+            unlinkSystemCommissionAccount(link.getAccountId());
+        }else{
+            throw new UnsupportedOperationException();
+        }
+    }
+
+
+    private void linkSystemCommissionAccount(Long accountId) {
 
         Optional<TAccountMapping> accountOptional = accountMappingRepository.findSystemCommissionAccountMapped();
         Validate.isTrue(!accountOptional.isPresent(),"System commission account already exists, unmap first to change");
@@ -369,8 +399,8 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-    @Override
-    public void unlinkAgentCommissionAccount(Long accountId, Long agentId) {
+
+    private void unlinkAgentCommissionAccount(Long accountId, Long agentId) {
 
         Optional<TAccountMapping> mappingOptional = accountMappingRepository.findAgentCommissionAccountMapped(agentId);
         Validate.isPresent(mappingOptional,"Agent commission account mapping does not exist");
@@ -395,8 +425,8 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-    @Override
-    public void unlinkSystemCommissionAccount(Long accountId) {
+
+    private void unlinkSystemCommissionAccount(Long accountId) {
 
         Optional<TAccountMapping> mappingOptional = accountMappingRepository.findSystemCommissionAccountMapped();
         Validate.isPresent(mappingOptional,"System commission account mapping does not exist");

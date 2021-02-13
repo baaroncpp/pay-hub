@@ -18,7 +18,7 @@ public interface BaseApi<T> {
 
     @PostMapping(consumes = APPLICATION_JSON,
             produces = APPLICATION_JSON)
-    T add(T t);
+    T add(@RequestBody  T t);
 
     @GetMapping(path="/{id}",
             produces = APPLICATION_JSON)
@@ -27,7 +27,7 @@ public interface BaseApi<T> {
     @PutMapping(consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     T update(T t);
 
-    @DeleteMapping(produces = APPLICATION_JSON)
+    @DeleteMapping(path="/{id}",produces = APPLICATION_JSON)
     T delete(long id);
 
     @GetMapping(path="/all", produces = APPLICATION_JSON)

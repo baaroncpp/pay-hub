@@ -5,6 +5,7 @@ import com.jajjamind.payvault.core.api.agent.models.Agent;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.repository.agent.JooqAgentRepository;
 import com.jajjamind.payvault.core.service.agent.AgentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
  * 11/01/2021
  * 15:00
  **/
+@Tag(name = "Agent",description = "Agent Management")
 @RestController
 @RequestMapping("/agent")
 public class AgentApi implements BaseApi<Agent> {
