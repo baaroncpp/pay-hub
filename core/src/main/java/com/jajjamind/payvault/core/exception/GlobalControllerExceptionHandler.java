@@ -1,6 +1,7 @@
 package com.jajjamind.payvault.core.exception;
 
 import com.jajjamind.commons.exceptions.BadRequestException;
+import com.jajjamind.commons.utils.RealTimeUtil;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import org.hibernate.HibernateException;
 import org.springframework.http.HttpStatus;
@@ -48,15 +49,23 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public SystemException genericException(Exception ex){
-        ex.printStackTrace();
+        final String tracingId = RealTimeUtil.generateTransactionId();
+        logException(ex,tracingId);
         if(ex instanceof HibernateException){
-            return getSystemException("Record CRUD operation failure. Please contact support");
+            return getSystemException("Record CRUD operation failure. Please contact support ID: "+tracingId);
 
+        }
+
+        if(ex instanceof RuntimeException){
+            return getSystemException("System exception occurred. Please contact support ID: "+tracingId);
         }
         return getSystemException(ex.getMessage());
     }
 
-
+    private void logException(Exception ex,String tracingId){
+        ex.addSuppressed(new Throwable("Support ID: "+tracingId));
+        ex.printStackTrace();
+    }
     private SystemException getSystemException(String message){
         return new SystemException(message);
     }
