@@ -1,6 +1,8 @@
 package com.jajjamind.commons.utils;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -12,37 +14,33 @@ import java.util.Optional;
 public class Validate {
 
     public static void isTrue(boolean value, String message,Object ... params){
-        Assert.isTrue(value,
-                String.format(message,params));
+        if (!value) {
+            throw new BadRequestException(message,params);
+        }
     }
 
     public static void notNull(Object value, String message,String ... params){
-        Assert.notNull(value,
-                String.format(message,params));
-    }
 
-    public static void notNull(Object value, String message){
-        Assert.notNull(value,message);
+        if (value == null) {
+            throw new BadRequestException(message,params);
+        }
     }
 
     public static void notEmpty(String value, String message,String ... params){
-        Assert.hasLength(value,
-                String.format(message,params));
+        if (!StringUtils.hasLength(value)) {
+            throw new BadRequestException(message,params);
+        }
     }
 
     public static void notEmpty(String value, String message){
-        Assert.hasLength(value,
-                String.format(message,message));
+        if (!StringUtils.hasLength(value)) {
+            throw new BadRequestException(message);
+        }
     }
 
     public static void isPresent(Optional<?> value, String message, Object ... params){
         if(!value.isPresent()){
-             throw new IllegalArgumentException(String.format(message,params));
+             throw new BadRequestException(String.format(message,params));
         }
     }
-
-    public static void isNull(Object value, String message){
-        Assert.isNull(value,message);
-    }
-
 }

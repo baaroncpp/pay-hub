@@ -40,4 +40,6 @@ public class ErrorMessageConstants {
     public static final String COMMISSION_ACCOUNT_REQUIRED = "Account provided must be a commission account";
     public static final String AGENT_ACCOUNT_NOT_FOUND = "Agent account could not be found in the system. Please contact support";
 
+    public static final String OPERATION_NOT_SUPPORTED = "The operation requested is currently not supported by system. Please contact support";
+
 }
