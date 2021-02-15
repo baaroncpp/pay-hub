@@ -1,7 +1,10 @@
 package com.jajjamind.payvault.core.service.product;
 
 import com.jajjamind.payvault.core.api.product.models.Product;
+import com.jajjamind.payvault.core.api.product.models.ProductCategory;
 import com.jajjamind.payvault.core.service.BaseApiService;
+
+import java.util.List;
 
 /**
  * @author akena
@@ -12,4 +15,5 @@ public interface ProductService extends BaseApiService<Product> {
 
     void deactivateProduct(Long id);
     void activateProduct(Long id);
+    List<ProductCategory> getWithCategoryGrouping();
 }

@@ -1,22 +1,31 @@
 package com.jajjamind.payvault.core.service.product;
 
-import com.jajjamind.commons.text.StringUtil;
+import com.jajjamind.commons.exceptions.BadRequestException;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
+import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
+import com.jajjamind.payvault.core.api.product.models.NameAndNoteModel;
 import com.jajjamind.payvault.core.api.product.models.Product;
+import com.jajjamind.payvault.core.api.product.models.ProductCategory;
+import com.jajjamind.payvault.core.exception.ServiceApiNotSupported;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
-import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 import com.jajjamind.payvault.core.jpa.models.product.TProduct;
+import com.jajjamind.payvault.core.jpa.models.product.TProductCategory;
+import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.repository.account.AccountRepository;
 import com.jajjamind.payvault.core.repository.product.ProductRepository;
+import com.jajjamind.payvault.core.repository.product.TProductCategoryRepository;
+import com.jajjamind.payvault.core.service.utilities.AccountUtilities;
 import com.jajjamind.payvault.core.utils.AuditService;
-import org.springframework.beans.BeanUtils;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,127 +46,117 @@ public class ProductServiceImpl  implements ProductService{
     @Autowired
     public ProductRepository productRepository;
 
+    @Autowired
+    public TProductCategoryRepository productCategoryRepository;
+
     @Override
     public Product add(Product product) {
-        product.validate();
-
-        var accountId = product.getProductAccount().getId();
-        Validate.notNull(accountId, ErrorMessageConstants.ACCOUNT_ID_CANNOT_BE_NULL);
-
-        Optional<TAccount> account = accountRepository.findById(accountId);
-
-        Validate.isTrue(account.isPresent(),ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,accountId);
-        Validate.isTrue(account.get().getAccountStatus().equals(AccountStatusEnum.NOT_ACTIVE),"Account with ID %s is not usable ",account.get().getId());
-        Validate.isTrue(!account.get().getAssigned(), ErrorMessageConstants.ACCOUNT_ALREADY_ASSIGNED);
-
-        TProduct tProduct = new TProduct();
-        BeanUtils.copyProperties(product,tProduct);
-        tProduct.setNonActive(Boolean.TRUE);
-
-        tProduct.setProductAccount(account.get());
-
-        auditService.stampAuditedEntity(tProduct);
-
-        productRepository.save(tProduct);
-
-        Optional<TProduct> oSavedProduct = productRepository.findByNameAndProvider(product.getName(),product.getProvider());
-
-        Validate.isTrue(oSavedProduct.isPresent(),"Product creation failed");
-        TProduct savedProduct = oSavedProduct.get();
-
-        final String productCode = getProductCode(product.getProductCategory(),savedProduct.getId());
-        savedProduct.setProductCode(productCode);
-
-        productRepository.save(savedProduct);
-
-        return product;
+        throw new ServiceApiNotSupported("Product addition is not supported");
     }
 
     @Override
     public Product get(Long id) {
 
-        Optional<TProduct> oProduct = productRepository.findById(id);
-        Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id);
+        final TProduct product = findByIdNotNull(id);
 
-        TProduct product = oProduct.get();
-        Product mProduct = new Product();
+        final Product mProduct = new Product();
 
-        BeanUtils.copyProperties(product,mProduct);
+        BeanUtilsCustom.copyProperties(product,mProduct);
+        mProduct.setStatus(Boolean.TRUE.equals(product.getNonActive()) ? StatusEnum.NOT_ACTIVE : StatusEnum.ACTIVE);
 
+        final NameAndNoteModel category = new NameAndNoteModel();
+        BeanUtilsCustom.copyProperties(product.getProductCategory(),category);
+        mProduct.setProductCategory(category);
+
+        final NameAndNoteModel provider = new NameAndNoteModel();
+        BeanUtilsCustom.copyProperties(product.getProvider(),provider);
+        mProduct.setProvider(provider);
+
+        final NameAndNoteModel rootProvider = new NameAndNoteModel();
+        BeanUtilsCustom.copyProperties(product.getRootProvider(),rootProvider);
+        mProduct.setRootProvider(rootProvider);
+
+        if(mProduct.getProductAccount() != null ) {
+            final Account acc = new Account();
+            BeanUtilsCustom.copyProperties(product.getProductAccount(), product);
+            mProduct.setProductAccount(acc);
+        }
         return mProduct;
     }
 
+    @Transactional
     @Override
     public Product update(Product product) {
 
         product.validate();
         Validate.notNull(product.getId(),"Product ID to update cannot be null");
 
-        Optional<TProduct> oProduct = productRepository.findById(product.getId());
-        Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,product.getId());
+        TProduct savedProduct = productRepository.findProductWithAccountNullable(product.getId()).orElseThrow(() -> new BadRequestException(ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,product.getId()));
 
-        if(product.getStatus().equals(StatusEnum.ACTIVE)){
-            Optional<TProduct> anyOtherProduct = productRepository.findNotMatchingIdByCategoryAndActive(product.getProductCategory().name(),
-                    product.getRootProvider().name(),
-                    oProduct.get().getId());
-
-            Validate.isTrue(!anyOtherProduct.isPresent(),"There is already an active product with the same root provider");
-        }
-
-        TProduct savedProduct = oProduct.get();
-
-        var changingAccount = false;
-        var newAccountId = product.getProductAccount().getId();
+        savedProduct.setOfficialName(product.getOfficialName());
+        savedProduct.setHasCharge(product.getHasCharge());
+        savedProduct.setHasTariff(product.getHasTariff());
+        savedProduct.setHasSmsNotification(product.getHasSmsNotification());
 
         TAccount oldAccount = savedProduct.getProductAccount();
 
-        if(!newAccountId.equals(oldAccount.getId()))
-        {
-            Validate.isTrue(oldAccount.getAvailableBalance().compareTo(BigDecimal.ZERO) == 0,"Current attached account should have zero balance before it can be changed");
+        if((oldAccount != null && product.getProductAccount() != null) || (oldAccount == null && product.getProductAccount() != null)){
 
-            Optional<TAccount> account = accountRepository.findById(product.getProductAccount().getId());
+            if(oldAccount == null){
+                TAccount account = accountRepository.findById(product.getProductAccount().getId())
+                        .orElseThrow(() -> new BadRequestException(ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,product.getProductAccount().getId()));
 
-            Validate.isTrue(account.isPresent(),ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,product.getProductAccount().getId());
-            Validate.isTrue(account.get().getAccountStatus().equals(AccountStatusEnum.NOT_ACTIVE),"Account with ID %s is not usable ",account.get().getId());
-            Validate.isTrue(!account.get().getAssigned(), ErrorMessageConstants.ACCOUNT_ALREADY_ASSIGNED);
+                AccountUtilities.checkThatAccountCanBeAssigned(account);
 
-            changingAccount = true;
-        }
+                account.setAssigned(Boolean.TRUE);
+                account.setAccountStatus(AccountStatusEnum.ACTIVE);
 
-        BeanUtils.copyProperties(product,savedProduct);
+                auditService.stampAuditedEntity(account);
+                accountRepository.save(account);
 
-        final TAccount k = new TAccount();
-        k.setId(product.getProductAccount().getId());
-        savedProduct.setProductAccount(k);
+                savedProduct.setProductAccount(account);
+            }else if (!product.getProductAccount().getId().equals(oldAccount.getId())){
 
-        auditService.stampAuditedEntity(savedProduct);
-        productRepository.save(savedProduct);
+                AccountUtilities.checkThatAccountCanBeUnAssigned(oldAccount);
+                TAccount account = accountRepository.findById(product.getProductAccount().getId())
+                        .orElseThrow(() -> new BadRequestException(ErrorMessageConstants.ACCOUNT_WITH_ID_NOT_FOUND,product.getProductAccount().getId()));
 
-        if(changingAccount){
+                AccountUtilities.checkThatAccountCanBeAssigned(account);
 
-            Optional<TAccount> account = accountRepository.findById(product.getProductAccount().getId());
-            if(account.isPresent()){
-                TAccount newAccount = account.get();
-                newAccount.setAssigned(Boolean.TRUE);
-                newAccount.setAccountStatus(AccountStatusEnum.ACTIVE);
+                oldAccount.setAccountStatus(AccountStatusEnum.CLOSED);
+                oldAccount.setAssigned(Boolean.FALSE);
+                oldAccount.setClosedOn(DateTimeUtil.getCurrentUTCTime());
 
-                auditService.stampAuditedEntity(newAccount);
-                accountRepository.save(newAccount);
+                TUser user = new TUser();
+                user.setId(auditService.getLoggedInUser().getId());
+
+                oldAccount.setClosedBy(user);
+                oldAccount.setStatusDescription(AccountStatusEnum.CLOSED.getDescription());
+
+                auditService.stampAuditedEntity(oldAccount);
+                accountRepository.save(oldAccount);
+
+                account.setStatusDescription(AccountStatusEnum.ACTIVE.getDescription());
+                account.setAccountStatus(AccountStatusEnum.ACTIVE);
+                account.setAssigned(Boolean.TRUE);
+
+                auditService.stampAuditedEntity(account);
+                accountRepository.save(account);
+
+
             }
 
-            oldAccount.setAccountStatus(AccountStatusEnum.NOT_ACTIVE);
-            oldAccount.setAssigned(Boolean.FALSE);
-
-            auditService.stampAuditedEntity(oldAccount);
-            accountRepository.save(oldAccount);
         }
+
+         auditService.stampAuditedEntity(savedProduct);
+         productRepository.save(savedProduct);
 
         return product;
     }
 
     @Override
     public Product delete(Long id) {
-        return null;
+        throw new ServiceApiNotSupported("Product deletion is not supported");
     }
 
     @Override
@@ -166,7 +165,7 @@ public class ProductServiceImpl  implements ProductService{
 
         Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id);
         TProduct product = oProduct.get();
-        Validate.isTrue(product.getNonActive(),"Product is already de-activated");
+        Validate.isTrue(!product.getNonActive(),"Product is already de-activated");
 
         product.setNonActive(Boolean.TRUE);
 
@@ -178,17 +177,17 @@ public class ProductServiceImpl  implements ProductService{
 
     @Override
     public void activateProduct(Long id) {
-        Optional<TProduct> oProduct = productRepository.findById(id);
+        TProduct product = productRepository.findByIdWithCategory(id).orElseThrow(() -> new BadRequestException(ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id));
+        Validate.isTrue(product.getNonActive(),"Product is already activated");
 
-        Validate.isTrue(oProduct.isPresent(),ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id);
-        TProduct product = oProduct.get();
-        Validate.isTrue(!product.getNonActive(),"Product is already activated");
+        TProductCategory category = productCategoryRepository.findById(
+                product.getProductCategory().getId()).orElseThrow(() -> new BadRequestException("Failed to retrieve product Category"));
 
-        Optional<TProduct> anyOtherProduct = productRepository.findNotMatchingIdByCategoryAndActive(product.getProductCategory().name(),
-                product.getRootProvider().name(),
-                id);
-
-        Validate.isTrue(!anyOtherProduct.isPresent(),"There is already an active product with the same root provider");
+        category.getProducts().forEach(t -> {
+            if(t.getId().equals(id)){
+                Validate.isTrue(t.getNonActive(),"There is already an active product with the same root provider");
+            }
+        });
 
         product.setNonActive(Boolean.FALSE);
         auditService.stampAuditedEntity(product);
@@ -199,11 +198,52 @@ public class ProductServiceImpl  implements ProductService{
 
     @Override
     public List<Product> getAll() {
-        throw new UnsupportedOperationException();
+        Iterable<TProduct> product = productRepository.findAll();
+        List<Product> products = new ArrayList<>();
+
+        product.forEach(t -> {
+
+            Product tm = new Product();
+            products.add(tm);
+        });
+
+        return products;
     }
 
-    private String getProductCode(ProductCategoryEnum categoryEnum,Long id){
-        final String code = StringUtil.getSequenceForDefinedZeros(String.valueOf(id),4);
-        return categoryEnum.getCode().concat(code);
+
+    @Override
+    public List<ProductCategory> getWithCategoryGrouping() {
+
+        Iterable<TProductCategory> categories = productCategoryRepository.findAll();
+        List<ProductCategory> category = new ArrayList<>();
+
+        categories.forEach(t ->
+        {
+            List<Product> product = new ArrayList<>();
+            t.getProducts().forEach(k -> product.add(getProductFromTProduct(k)));
+
+            ProductCategory c = new ProductCategory();
+            c.setId(t.getId());
+            c.setName(t.getName());
+            c.setProducts(product);
+
+            category.add(c);
+        });
+
+        return category;
+    }
+
+
+    private Product getProductFromTProduct(TProduct t){
+        final Product tm = new Product();
+        BeanUtilsCustom.copyProperties(t,tm);
+        tm.setStatus(Boolean.TRUE.equals(t.getNonActive()) ? StatusEnum.NOT_ACTIVE : StatusEnum.ACTIVE);
+
+        return tm;
+
+    }
+
+    private TProduct findByIdNotNull(Long id){
+       return  productRepository.findByIdWithAllParams(id).orElseThrow(() -> new BadRequestException(ErrorMessageConstants.PRODUCT_WITH_ID_NOT_FOUND,id));
     }
 }

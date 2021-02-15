@@ -106,14 +106,15 @@ public class TransactionServiceImpl implements TransactionService{
         if(ObjectUtils.anyNull(currentAccount) || !currentAccount.getAssigned() || currentAccount.getAccountStatus().equals(AccountStatusEnum.NOT_ACTIVE)
         ||currentProduct.getNonActive())
         {
-            //Product cannot be used -- invalid states
-            //Resolve new product to use that provides same service
-            Optional<TProduct> product = productRepository.findByCategoryDetailsForTransaction(currentProduct.getProductCategory().name(),
-                    currentProduct.getRootProvider().name());
-
-            Validate.isPresent(product,ErrorMessageConstants.PRODUCT_REQUEST_FAILED_NOT_ACTIVE);
-
-            return product.get();
+//            //Product cannot be used -- invalid states
+//            //Resolve new product to use that provides same service
+//            Optional<TProduct> product = productRepository.findByCategoryDetailsForTransaction(currentProduct.getProductCategory().name(),
+//                    currentProduct.getRootProvider().name());
+//
+//            Validate.isPresent(product,ErrorMessageConstants.PRODUCT_REQUEST_FAILED_NOT_ACTIVE);
+//
+//            return product.get();
+            return null;
 
         }
 

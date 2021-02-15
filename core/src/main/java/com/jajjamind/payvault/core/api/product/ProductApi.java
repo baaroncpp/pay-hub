@@ -2,12 +2,14 @@ package com.jajjamind.payvault.core.api.product;
 
 import com.jajjamind.payvault.core.BaseApi;
 import com.jajjamind.payvault.core.api.product.models.Product;
+import com.jajjamind.payvault.core.api.product.models.ProductCategory;
 import com.jajjamind.payvault.core.api.product.models.ProductCommissionTemplate;
 import com.jajjamind.payvault.core.exception.ServiceApiNotSupported;
 import com.jajjamind.payvault.core.service.product.ProductCommissionTemplateService;
 import com.jajjamind.payvault.core.service.product.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -32,7 +34,7 @@ public class ProductApi implements BaseApi<Product> {
 
     @RolesAllowed("ROLE_PRODUCT.WRITE")
     @Override
-    public Product add( Product product) {
+    public Product add( @Nullable  Product product) {
 
         return productService.add(product);
     }
@@ -57,19 +59,27 @@ public class ProductApi implements BaseApi<Product> {
 
     @Override
     public List<Product> getAll() {
-        throw new ServiceApiNotSupported("Product listing is not yet implemented");
+
+        return productService.getAll();
     }
+
+    @GetMapping(value = "/all/by-category",produces = APPLICATION_JSON)
+    public List<ProductCategory> getAllByProductCategory() {
+
+        return productService.getWithCategoryGrouping();
+    }
+
 
     @RolesAllowed({"ROLE_PRODUCT.ENABLE","ROLE_PRODUCT.WRITE"})
     @PostMapping("/{id}/disable")
     public void disableProduct(@PathVariable("id") Long id){
-
+        productService.deactivateProduct(id);
     }
 
     @RolesAllowed({"ROLE_PRODUCT.DISABLE","ROLE_PRODUCT.WRITE"})
     @PostMapping("/{id}/enable")
     public void enableProduct(@PathVariable("id") Long id){
-
+        productService.activateProduct(id);
     }
 
     @RolesAllowed("ROLE_PRODUCT_TEMPLATE.WRITE")

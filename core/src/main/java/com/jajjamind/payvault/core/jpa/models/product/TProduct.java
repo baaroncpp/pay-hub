@@ -2,8 +2,6 @@ package com.jajjamind.payvault.core.jpa.models.product;
 
 import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
-import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
-import com.jajjamind.payvault.core.jpa.models.enums.RootServiceProviderEnum;
 
 import javax.persistence.*;
 
@@ -18,19 +16,19 @@ import javax.persistence.*;
 public class TProduct extends AuditedEntity {
 
     private TAccount productAccount;
+    private TProductCategory productCategory;
     private String name;
     private Boolean nonActive;
-    private String provider;
-    private ProductCategoryEnum productCategory;
+    private TProvider provider;
     private String productCode;
     private String officialName;
     private Boolean hasCharge;
     private Boolean hasTariff;
     private Boolean hasSmsNotification;
-    private RootServiceProviderEnum rootProvider;
+    private TProvider rootProvider;
 
 
-    @JoinColumn(name = "product_code",referencedColumnName = "code",insertable = false,updatable = false)
+    @JoinColumn(name = "product_account",referencedColumnName = "code",insertable = false,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TAccount getProductAccount() {
         return productAccount;
@@ -58,21 +56,23 @@ public class TProduct extends AuditedEntity {
         this.nonActive = nonActive;
     }
 
-    @Column(name = "provider")
-    public String getProvider() {
+    @JoinColumn(name = "provider",referencedColumnName = "id",insertable = false,updatable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    public TProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(String provider) {
+    public void setProvider(TProvider provider) {
         this.provider = provider;
     }
 
-    @Column(name = "category")
-    public ProductCategoryEnum getProductCategory() {
+    @JoinColumn(name = "category",referencedColumnName = "id",insertable = false,updatable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    public TProductCategory getProductCategory() {
         return productCategory;
     }
 
-    public void setProductCategory(ProductCategoryEnum productCategory) {
+    public void setProductCategory(TProductCategory productCategory) {
         this.productCategory = productCategory;
     }
 
@@ -121,13 +121,13 @@ public class TProduct extends AuditedEntity {
         this.hasSmsNotification = hasSmsNotification;
     }
 
-    @Column(name = "root_provider")
-    @Enumerated(EnumType.STRING)
-    public RootServiceProviderEnum getRootProvider() {
+    @JoinColumn(name = "root_provider",referencedColumnName = "id",insertable = false,updatable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    public TProvider getRootProvider() {
         return rootProvider;
     }
 
-    public void setRootProvider(RootServiceProviderEnum rootProvider) {
+    public void setRootProvider(TProvider rootProvider) {
         this.rootProvider = rootProvider;
     }
 }

@@ -7,6 +7,7 @@ import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.utils.Money;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ import java.util.Date;
  **/
 @Entity
 @Table(name = "t_account",schema = "core")
-public class TAccount extends AuditedEntity {
+public class TAccount extends AuditedEntity implements Serializable {
 
     private String name;
     private String code;

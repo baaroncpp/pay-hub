@@ -19,10 +19,20 @@ public interface ProductRepository extends CrudRepository<TProduct,Long> {
     @Query("SELECT u from TProduct u WHERE u.name = :name and u.provider = :provider")
     Optional<TProduct> findByNameAndProvider(@Param("name") String name,@Param("provider") String provider);
 
+    @Query("SELECT u from TProduct u inner join fetch u.productCategory inner join fetch u.provider inner join fetch u.rootProvider left join fetch u.productAccount where u.id = :id")
+    Optional<TProduct> findByIdWithAllParams(@Param("id") Long id);
+
+
+    @Query("SELECT u from TProduct u inner join fetch u.productCategory where u.id = :id")
+    Optional<TProduct> findByIdWithCategory(@Param("id") Long id);
+
     @Query("Select u from TProduct u inner join fetch u.productAccount WHERE u.id = :id")
     Optional<TProduct> findProductWithAccount(@Param("id") Long id);
 
-    @Query("SELECT u from TProduct u WHERE u.productCategory = :category and u.rootProvider = :rootProvider and u.nonActive = false and u.id <> :id")
+    @Query("Select u from TProduct u left join fetch u.productAccount WHERE u.id = :id")
+    Optional<TProduct> findProductWithAccountNullable(@Param("id") Long id);
+
+    @Query("SELECT u from TProduct u WHERE u.productCategory.name = :category and u.rootProvider.id = :rootProvider and u.nonActive = false and u.id <> :id")
     Optional<TProduct> findNotMatchingIdByCategoryAndActive(@Param("category") String category,@Param("rootProvider") String rootProvider,@Param("id") Long id);
 
     @Query("SELECT u from TProduct u left join fetch u.productAccount WHERE u.productCode = :productCode")

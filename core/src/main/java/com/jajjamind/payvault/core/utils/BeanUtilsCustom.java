@@ -4,6 +4,7 @@ import com.jajjamind.payvault.core.jpa.models.AuditedEntity;
 import org.jboss.logging.Logger;
 import org.springframework.beans.FatalBeanException;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  **/
 public class BeanUtilsCustom {
 
-    public static void copyProperties(Object source, Object target) {
+    public static void copyProperties(@NotNull Object source,@NotNull Object target) {
         final List<Method> sourceGetters = Arrays.stream(source.getClass().getMethods()).filter(t -> t.getName().startsWith("get") || t.getName().startsWith("is"))
                 .collect(Collectors.toList());
         final List<Method> targetSetters = Arrays.stream(target.getClass().getMethods()).filter(t -> t.getName().startsWith("set")).collect(Collectors.toList());
