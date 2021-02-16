@@ -3,6 +3,7 @@ package com.jajjamind.payvault.core.config.security;
 import com.jajjamind.payvault.core.service.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,7 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().mvcMatchers(SWAGGER_URL_PATHS);
+        web.ignoring().mvcMatchers(SWAGGER_URL_PATHS).
+                and().ignoring().mvcMatchers(HttpMethod.OPTIONS,"/**");
     }
 
     @Override
