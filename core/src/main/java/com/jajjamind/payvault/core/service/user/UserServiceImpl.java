@@ -356,6 +356,15 @@ public class UserServiceImpl implements UserService {
         return jooqUserRepository.listAndCount(map);
     }
 
+    @Override
+    public Boolean isUsernameTaken(String username) {
+        Optional<TUser> user = userRepository.findByUsername(username);
+        if(user.isPresent()){
+            return true;
+        }
+        return false;
+    }
+
 
     private TUserApproval getPendingUserApproval(Long id){
         Optional<TUserApproval> approval = userApprovalRepository.findByUserIdForApproval(id);

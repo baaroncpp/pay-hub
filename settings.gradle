@@ -5,4 +5,5 @@ include 'serenity-tests'
 include 'mobile-money'
 include 'interswitch'
 include 'data-bundles'
+include 'notofication-service'
 

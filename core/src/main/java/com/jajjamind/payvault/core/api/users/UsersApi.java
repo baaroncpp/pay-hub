@@ -95,6 +95,12 @@ public class UsersApi implements BaseApi<User> {
         userService.resetPassword(oldPassword,newPassword);
     }
 
+    @RolesAllowed("ROLE_ADMIN.READ")
+    @PostMapping("/{username}/check")
+    public Boolean isUsernameTaken(@PathVariable("username") String username){
+        return userService.isUsernameTaken(username);
+    }
+
 
     /**
      * Important params include
