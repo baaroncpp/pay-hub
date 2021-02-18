@@ -2,6 +2,7 @@ package com.payhub.notification.entities;
 
 import java.util.Date;
 
+
 public class NotificationReceipt {
     private String id;
     private String reference;

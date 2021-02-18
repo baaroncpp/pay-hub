@@ -1,5 +1,6 @@
 package com.payhub.notification.config;
 
+import com.payhub.notification.api.NotificationApi;
 import com.payhub.notification.network.RetrofitSkylineService;
 import com.payhub.notification.network.SkylineAPIService;
 import com.payhub.notification.service.EmailService;
@@ -56,5 +57,10 @@ public class Config {
         props.put("mail.smtp.ssl.enable", "true");
 
         return mailSender;
+    }
+
+    @Bean
+    public NotificationApi getNotificationApi(){
+        return new NotificationApi();
     }
 }

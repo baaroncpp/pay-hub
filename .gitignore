@@ -1,4 +1,7 @@
-.gradle
+.iml
+.iws
+.ipr
+#.gradle
 **/build/
 !src/**/build/
 
@@ -12,7 +15,7 @@ gradle-app.setting
 .gradletasknamecache
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
-# gradle/wrapper/gradle-wrapper.propertiesi
+ gradle/wrapper/gradle-wrapper.propertiesi
 
 # Ignore serenity compilation output
 **/serenity-tests/out/test/

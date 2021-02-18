@@ -9,9 +9,7 @@ import java.util.List;
  **/
 @lombok.Data
 public class SmsMessage {
-
     private String message;
     private List<String> deliverTo;
     private Boolean requireDeliveryReceipt;
-
 }

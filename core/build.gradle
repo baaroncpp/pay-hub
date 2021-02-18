@@ -66,6 +66,7 @@ dependencies {
 	implementation project(':interswitch')
 	implementation project(':mobile-money')
 	implementation project(':data-bundles')
+	implementation project(':notofication-service')
 
 }
 
