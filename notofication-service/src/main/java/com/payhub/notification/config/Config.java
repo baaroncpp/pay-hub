@@ -1,8 +1,6 @@
 package com.payhub.notification.config;
 
 import com.payhub.notification.api.NotificationApi;
-import com.payhub.notification.network.RetrofitSkylineService;
-import com.payhub.notification.network.SkylineAPIService;
 import com.payhub.notification.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

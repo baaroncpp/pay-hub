@@ -12,4 +12,5 @@ public class SmsMessage {
     private String message;
     private List<String> deliverTo;
     private Boolean requireDeliveryReceipt;
+    private String smsType;
 }

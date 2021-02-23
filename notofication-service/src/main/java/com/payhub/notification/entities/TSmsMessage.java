@@ -25,7 +25,6 @@ public class TSmsMessage {
     private Date createdOn;
     private Date modifiedOn;
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public String getId() {
