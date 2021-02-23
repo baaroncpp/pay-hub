@@ -30,8 +30,8 @@ public interface QueryResultPicker {
     default MultiValueMap<String, Object> addCountParams(MultiValueMap<String, ?> map) {
         final MultiValueMap<String, Object> multivaluedHashMap = new LinkedMultiValueMap(map);
         multivaluedHashMap.add("showList", "false");
-        multivaluedHashMap.add("offset", "0");
-        multivaluedHashMap.add("limit", "5");
+        multivaluedHashMap.put("offset",Arrays.asList("0"));
+        multivaluedHashMap.put("limit", Arrays.asList("5"));
         return multivaluedHashMap;
     }
 }
