@@ -347,7 +347,7 @@ class Jooqify {
 
                 codeBlock('public RecordList<Result> listAndCount(MultiValueMap<String,?> map)') {
                     writeln "final RecordList<Result> result  = new RecordList<Result>(count(map),list(map));"
-                    writeln "result.setOffset(map.containsKey(\"offset\") ? (int) map.getFirst(\"offset\") : null);"
+                    writeln " result.setOffset(map.containsKey(\"offset\") ? Integer.valueOf((String)map.getFirst(\"offset\")) : null);"
                     writeln "result.setRecordsFiltered(result.getRecords().size());"
                     writeln "return result;"
                 }

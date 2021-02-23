@@ -194,7 +194,7 @@ public class JooqAccountRepository implements QueryResultPicker{
 
     public RecordList<Result> listAndCount(MultiValueMap<String,?> map){
         final RecordList<Result> result  = new RecordList<Result>(count(map),list(map));
-        result.setOffset(map.containsKey("offset") ? (int) map.getFirst("offset") : null);
+        result.setOffset(map.containsKey("offset") ? Integer.valueOf((String)map.getFirst("offset")) : null);
         result.setRecordsFiltered(result.getRecords().size());
         return result;
     }
