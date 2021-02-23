@@ -31,3 +31,7 @@ gradle-app.setting
 payvault-aggregators.iml
 payvault-aggregators.iws
 payvault-aggregators.ipr
+.gradle/*
+commons/.gradle/*
+core/.gradle/*
+deploy.sh
