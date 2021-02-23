@@ -14,7 +14,7 @@ public class NotificationApi {
     @Autowired
     private NotificationService notificationService;
 
-    public SmsResponse sendSms(Notification notification) throws IOException {
+    public SmsResponse sendSms(Notification notification) {
         return notificationService.sendSms(notification);
     }
 

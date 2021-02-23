@@ -1,7 +1,5 @@
 package com.payhub.notification.entities;
 
-
-import com.payhub.notification.constants.NotificationType;
 import com.payhub.notification.constants.SmsDelivery;
 
 import javax.persistence.*;
@@ -15,14 +13,14 @@ public class SmsNotification {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "mesaage")
+    @Column(name = "message")
     private String message;
 
     @Column(name = "sms_delivery")
     private SmsDelivery smsDelivery;
 
     @Column(name = "notification_type")
-    private NotificationType notificationType;
+    private String notificationType;
 
     @Column(name = "reference")
     private String reference;
@@ -63,11 +61,11 @@ public class SmsNotification {
         this.smsDelivery = smsDelivery;
     }
 
-    public NotificationType getNotificationType() {
+    public String getNotificationType() {
         return notificationType;
     }
 
-    public void setNotificationType(NotificationType notificationType) {
+    public void setNotificationType(String notificationType) {
         this.notificationType = notificationType;
     }
 

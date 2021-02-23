@@ -8,7 +8,7 @@ import com.payhub.notification.constants.NotificationType;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id", scope = Notification.class)
 public class Notification {
 
-	private NotificationType notificationType;
+	private String notificationType;
 	private String subject;
 	private String content;
 	private String address;
@@ -17,11 +17,11 @@ public class Notification {
 	public Notification() {
 	}
 
-	public NotificationType getNotificationType() {
+	public String getNotificationType() {
 		return notificationType;
 	}
 
-	public void setNotificationType(NotificationType notificationType) {
+	public void setNotificationType(String notificationType) {
 		this.notificationType = notificationType;
 	}
 
