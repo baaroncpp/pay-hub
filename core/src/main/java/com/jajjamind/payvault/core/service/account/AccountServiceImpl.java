@@ -7,6 +7,7 @@ import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountLink;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
+import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.jpa.models.account.TAccount;
 import com.jajjamind.payvault.core.jpa.models.account.TAccountGrouping;
 import com.jajjamind.payvault.core.jpa.models.account.TAccountMapping;
@@ -15,7 +16,6 @@ import com.jajjamind.payvault.core.jpa.models.enums.AccountStatusEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.AccountTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
-import com.jajjamind.payvault.core.jpa.models.user.TGroup;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.repository.JooqFilter;
 import com.jajjamind.payvault.core.repository.account.AccountGroupingRepository;
@@ -27,7 +27,6 @@ import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.service.utilities.AccountUtilities;
 import com.jajjamind.payvault.core.utils.AuditService;
 import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
-import com.jajjamind.payvault.core.utils.Money;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -170,6 +169,12 @@ public class AccountServiceImpl implements AccountService {
 
         Validate.isTrue(!accounts.isEmpty(),"Failed to retrieve account information");
         return accounts.get(0);
+    }
+
+    @Override
+    public RecordList getAllAccounts(MultiValueMap map) {
+
+        return jooqAccountRepository.listAndCount(map);
     }
 
     @Override

@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import retrofit2.http.QueryMap;
 
 import javax.annotation.security.RolesAllowed;
 import java.util.List;
@@ -84,6 +83,12 @@ public class UsersApi implements BaseApi<User> {
         userService.rejectUser(userId);
 
     }
+    @RolesAllowed({"ROLE_USER.CHECKER","ROLE_USER.READ","ROLE_USER.WRITE"})
+    @GetMapping("/{username}/get")
+    public User getUserByUserName(@PathVariable("username") String username){
+        return userService.getByUserName(username);
+    }
+
     @RolesAllowed("ROLE_USER.CHECKER")
     @GetMapping("/approval")
     public List<UserMeta> getUsersForApproval(){

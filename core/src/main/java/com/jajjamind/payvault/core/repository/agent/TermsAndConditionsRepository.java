@@ -12,4 +12,8 @@ public interface TermsAndConditionsRepository extends CrudRepository<TTermsAndCo
 
     @Query(value = "Select u from TTermsAndConditions u where u.target = 'USER' and u.active = true")
     Optional<TTermsAndConditions> getActiveTermsAndConditionsForUser();
+
+    @Query(value = "Select u from TTermsAndConditions u where u.target = 'AGENT' and u.active = true")
+    Optional<TTermsAndConditions> getActiveTermsAndConditionsForAgent();
+
 }

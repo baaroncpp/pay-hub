@@ -3,7 +3,9 @@ package com.jajjamind.payvault.core.service.account;
 import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountLink;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
+import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
+import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ public interface AccountService {
     AccountingGroup addAccountGrouping(AccountingGroup accountGroup);
     AccountingGroup updateAccountGrouping(AccountingGroup accountGroup);
     JooqAccountRepository.Result getAccountById(Long id);
+    RecordList getAllAccounts(MultiValueMap map);
     Account getAccountByCode(String code);
     Account updateAccount(Account account);
     Boolean deactivateAccount(Long accountId);

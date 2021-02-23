@@ -1,30 +1,30 @@
 package com.jajjamind.payvault.core.service.agent;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import com.jajjamind.commons.time.DateTimeUtil;
+import com.jajjamind.commons.utils.RealTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.agent.models.Agent;
 import com.jajjamind.payvault.core.api.agent.models.Company;
-import com.jajjamind.payvault.core.api.constants.Constants;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
+import com.jajjamind.payvault.core.api.users.models.Approval;
+import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.api.users.models.UserMeta;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
-import com.jajjamind.payvault.core.jpa.models.agent.TAgent;
-import com.jajjamind.payvault.core.jpa.models.agent.TAgentApproval;
-import com.jajjamind.payvault.core.jpa.models.agent.TCompany;
-import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
-import com.jajjamind.payvault.core.jpa.models.config.TConfiguration;
+import com.jajjamind.payvault.core.jpa.models.agent.*;
+import com.jajjamind.payvault.core.jpa.models.enums.AgentTypeEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.CountryEnum;
 import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.jpa.models.user.TUserMeta;
 import com.jajjamind.payvault.core.repository.agent.*;
-import com.jajjamind.payvault.core.repository.config.ConfigurationRepository;
 import com.jajjamind.payvault.core.repository.user.UserMetaRepository;
 import com.jajjamind.payvault.core.security.models.LoggedInUser;
 import com.jajjamind.payvault.core.service.user.UserMetaServiceImpl;
-import com.jajjamind.payvault.core.service.utilities.SmsMessage;
+import com.jajjamind.payvault.core.service.utilities.Sms;
 import com.jajjamind.payvault.core.service.utilities.SmsService;
 import com.jajjamind.payvault.core.utils.AuditService;
+import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import com.jajjamind.payvault.core.utils.ValidateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author akena
@@ -72,16 +71,43 @@ public class AgentServiceImpl implements AgentService{
     public AgentApprovalRepository agentApprovalRepository;
 
     @Autowired
-    public ConfigurationRepository configurationRepository;
+    public TermsAndConditionsRepository termsAndConditionsRepository;
+
 
     @Autowired
     public SmsService smsService;
+
+    @Override
+    public boolean isUserNameTaken(String username) {
+        return agentRepository.checkThatUsernameIsNotTaken(username);
+    }
+
+    @Override
+    public Agent addSuperAgent(Agent agent) {
+        agent.validate();
+        Validate.isTrue(agent.getType().equals(AgentTypeEnum.SUPER_AGENT),"Agent is not a super agent");
+
+        return addAgent(agent);
+    }
+
+    @Override
+    public List<Agent> getSuperAgents() {
+        return null;
+    }
 
     @Override
     @Transactional
     public Agent add(Agent agent) {
 
         agent.validate();
+        Validate.isTrue(agent.getType().equals(AgentTypeEnum.SUPER_AGENT),"Agent is not a ordinary agent");
+
+        return addAgent(agent);
+
+    }
+
+    @Transactional
+    private Agent addAgent(Agent agent){
 
         checkThatUserNameIsNotAlreadyTaken(agent.getUsername());
 
@@ -93,10 +119,24 @@ public class AgentServiceImpl implements AgentService{
         final TCompany company = validateAndGetCompany(agent.getCompany(),userMeta.getCountryCode().getIsoAlpha2());
 
         final  TAgent tAgent = new TAgent();
-        BeanUtils.copyProperties(agent,tAgent);
+        BeanUtilsCustom.copyProperties(agent,tAgent);
 
         tAgent.setCompany(company);
-        tAgent.setPin(encodeUserPin(agent.getPin()));
+        tAgent.setApprovalStatus(ApprovalEnum.PENDING);
+        tAgent.setNonLocked(Boolean.TRUE);
+        tAgent.setNonDisabled(Boolean.TRUE);
+        tAgent.setNonLockedPin(Boolean.TRUE);
+        tAgent.setInitialPasswordReset(Boolean.FALSE);
+
+
+        final TTermsAndConditions termsAndConditions = new TTermsAndConditions();
+        termsAndConditions.setId(
+                agent.getTermsAndConditions().getId());
+        tAgent.setTermsAndConditions(termsAndConditions);
+
+        final String externalId = RealTimeUtil.externalId(userMeta.getPhoneNumber());
+        tAgent.setExternalId(externalId);
+
 
         auditService.stampAuditedEntity(tAgent);
         agentRepository.save(tAgent);
@@ -120,9 +160,9 @@ public class AgentServiceImpl implements AgentService{
         auditService.stampAuditedEntity(oUserMeta);
         userMetaRepository.save(oUserMeta);
 
-        createApprovalObject(savedAgent.getId());
+        createApprovalObject(savedAgent);
 
-
+        agent.setExternalId(externalId);
         return agent;
     }
 
@@ -165,9 +205,10 @@ public class AgentServiceImpl implements AgentService{
         updatedAgent.setUsername(oAgent.getUsername());
     }
 
-    private void createApprovalObject(Long agentId){
+    private void createApprovalObject(TAgent agentId){
         TAgentApproval approval = new TAgentApproval();
-        approval.setId(agentId);
+        approval.setStatus(ApprovalEnum.PENDING);
+        approval.setAgent(agentId);
 
         auditService.stampAuditedEntity(approval);
 
@@ -192,7 +233,7 @@ public class AgentServiceImpl implements AgentService{
 
         TCompany company = tCompany.get();
         Validate.isTrue(company.getRegistrationCountry().getIsoAlpha2().equals(agentCountry),ErrorMessageConstants.COUNTRY_PROVIDED_DOES_NOT_MATCH,
-                c.getRegistrationCountry().getIsoAlpha2(),agentCountry);
+                company.getRegistrationCountry().getIsoAlpha2(),agentCountry);
 
         return company;
     }
@@ -203,12 +244,13 @@ public class AgentServiceImpl implements AgentService{
     }
 
     private void checkThatAgentDoesNotExistAlready(UserMeta userMeta,String companyName){
-        Validate.isTrue(!agentRepository.checkThatAgentMatchesAny(userMeta.getFirstName(),userMeta.getLastName(),userMeta.getIdentificationNumber(),companyName),"A company with similar details already exists in the system");
+        Validate.isTrue(!agentRepository.checkThatAgentMatchesAny(userMeta.getFirstName(),
+                userMeta.getLastName(),userMeta.getIdentificationNumber(),companyName),"A company with similar details already exists in the system");
 
     }
 
     private void checkThatUserNameIsNotAlreadyTaken(String userName){
-        Validate.isTrue(agentRepository.checkThatUsernameIsNotTaken(userName), "Username %s is already taken");
+        Validate.isTrue(agentRepository.checkThatUsernameIsNotTaken(userName), "Username %s is already taken",userName);
     }
 
 
@@ -217,14 +259,37 @@ public class AgentServiceImpl implements AgentService{
         return jooqAgentRepository.listAndCount(k);
     }
 
+    @Override
+    public RecordList getAgentsPendingApproval(MultiValueMap map) {
+
+        map.put(JooqAgentRepository.FIELD_APPROVAL_STATUS,Arrays.asList("PENDING"));
+
+        return jooqAgentRepository.listAndCount(map);
+
+    }
+
+    @Override
+    public TermsAndConditions getTermsOfService() {
+        Optional<com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions> termsOfUse = termsAndConditionsRepository.getActiveTermsAndConditionsForAgent();
+        Validate.isTrue(termsOfUse.isPresent(),"Terms of use could not found");
+
+        com.jajjamind.payvault.core.jpa.models.agent.TTermsAndConditions tt = termsOfUse.get();
+        final TermsAndConditions ttf = new TermsAndConditions();
+        BeanUtils.copyProperties(tt,ttf);
+
+        return ttf;
+    }
+
     @Transactional
     @Override
-    public void approveOrRejectAgentCreation(Long id, String status,String comment) {
-        final Optional<TAgentApproval> agentApproval = agentApprovalRepository.findByIdWithAgent(id);
+    public void approveOrRejectAgentCreation(Approval mApproval) {
+        final ApprovalEnum status = mApproval.getStatus();
+        Validate.isTrue(status.equals(ApprovalEnum.REJECTED) ||
+                mApproval.equals(ApprovalEnum.APPROVED),ErrorMessageConstants.APPROVAL_STATUS_UNKNOWN,status);
 
-        Validate.isTrue(agentApproval.isPresent(),"No pending approval found with given ID");
+        TAgentApproval approval = agentApprovalRepository.findByIdWithAgent(mApproval.getId())
+            .orElseThrow(() -> new BadRequestException("No pending approval found with given ID"));
 
-        final TAgentApproval approval = agentApproval.get();
 
         Validate.isTrue(approval.getApprovalCount() < 2,"Agent creation has been approved");
         Validate.isTrue(approval.getStatus().equals(ApprovalEnum.PENDING),"Agent creation has been approved");
@@ -240,11 +305,11 @@ public class AgentServiceImpl implements AgentService{
         if(approval.getApprover1() == null){
             approval.setApprover1(approvingUser);
             approval.setApprovalCount(1);
-            approval.setNote(comment);
+            approval.setNote(mApproval.getNote());
             approval.setFirstApproveOn(DateTimeUtil.getCurrentUTCTime());
         }else {
             approval.setApprover2(approvingUser);
-            approval.setNote2(comment);
+            approval.setNote2(mApproval.getNote());
             approval.setApprovalCount(approval.getApprovalCount()+1);
             approval.setSecondApproveOn(DateTimeUtil.getCurrentUTCTime());
         }
@@ -252,45 +317,41 @@ public class AgentServiceImpl implements AgentService{
         auditService.stampAuditedEntity(approval);
         agentApprovalRepository.save(approval);
 
-        if(approval.getApprovalCount() == 2 && status.equalsIgnoreCase("approve"))
+        if(approval.getApprovalCount() == 2 && status.equals(ApprovalEnum.APPROVED))
         {
+
+            final String passcode = RealTimeUtil.getFourDigitPasscode();
+
+            agent.setPin(encodeUserPin(passcode));
             agent.setApprovalStatus(ApprovalEnum.APPROVED);
             auditService.stampAuditedEntity(agent);
-
             agentRepository.save(agent);
-            smsService.sendSmsMessage(agentCreationSMS(agent.getId().intValue()));
+
+            final String smsMessage = smsService.getSMSFromTemplate(getSMSContent(agent.getUserMeta().getPhoneNumber(),passcode), Sms.Name.AGENT_REGISTERED);
+            final String smsMessageMasked =  smsService.getSMSFromTemplate(getSMSContent(agent.getUserMeta().getPhoneNumber(),Sms.MASK), Sms.Name.AGENT_REGISTERED);
+            smsService.sendSms(smsMessage,smsMessageMasked,agent.getUserMeta().getPhoneNumber(),Boolean.FALSE);
 
         }
 
-        if(status.equalsIgnoreCase("reject")){
+        if(status.equals(ApprovalEnum.REJECTED)){
             approval.setStatus(ApprovalEnum.REJECTED);
             agentApprovalRepository.save(approval);
 
             agent.setApprovalStatus(ApprovalEnum.REJECTED);
+            agent.setUsername(agent.getUsername()+"_deleted_"+agent.getId());
             auditService.stampAuditedEntity(agent);
 
             agentRepository.save(agent);
         }
 
-
     }
 
+    private Map<String,String> getSMSContent(String msisdn,String pin){
+        final Map<String,String> placeHolders = new HashMap<>();
+        placeHolders.put("MSISDN",msisdn);
+        placeHolders.put("PIN",pin);
 
-    //Not so sure if to save copy on my side -- May have to
-    private SmsMessage agentCreationSMS(Integer  agent){
-
-        Optional<TConfiguration> smsConfig = configurationRepository.findByName(Constants.GET_AGENT_SMS_CONFIG_NAME);
-        Validate.isTrue(smsConfig.isPresent(),"Failed to get client SMS notification message");
-
-        final Optional<TUserMeta> mta = userMetaRepository.findByAgentId(agent);
-
-        final TConfiguration config = smsConfig.get();
-        final SmsMessage message = new SmsMessage();
-
-        message.setDeliverTo(List.of(mta.get().getPhoneNumber()));
-        message.setMessage(String.format(config.getValue(),mta.get().getFirstName().concat(" ").concat(mta.get().getLastName())));
-        message.setRequireDeliveryReceipt(Boolean.FALSE);
-
-        return message;
+        return placeHolders;
     }
+
 }

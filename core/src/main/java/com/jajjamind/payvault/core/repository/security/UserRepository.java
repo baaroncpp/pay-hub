@@ -19,6 +19,9 @@ public interface UserRepository extends CrudRepository<TUser,Long> {
     @Query("Select u from TUser u where u.username = :username")
     Optional<TUser> findByUsername(@Param("username")String username);
 
+    @Query("Select u from TUser u left join fetch u.userMeta where u.username = :username")
+    Optional<TUser> findByUsernameWithMeta(@Param("username")String username);
+
     @Query("Select u from TUser u left join fetch u.userAuthority left join fetch u.userMeta userMeta where u.id = :id")
     Optional<TUser> findUserById(@Param("id") Long id);
 

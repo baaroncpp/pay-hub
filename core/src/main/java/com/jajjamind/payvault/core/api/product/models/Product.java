@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.account.models.Account;
-import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
-import com.jajjamind.payvault.core.jpa.models.enums.RootServiceProviderEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 
 import java.util.Date;

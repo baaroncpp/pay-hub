@@ -25,4 +25,5 @@ public interface UserService extends BaseApiService<User> {
     void resetPassword(String oldPassword, String newPassword);
     RecordList queryForUsers(MultiValueMap map);
     Boolean isUsernameTaken(String username);
+    User getByUserName(String username);
 }

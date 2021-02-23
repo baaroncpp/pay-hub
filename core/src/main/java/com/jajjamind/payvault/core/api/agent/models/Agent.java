@@ -25,7 +25,6 @@ public class Agent {
     private AgentTypeEnum type;
     private String approvedBy;
     private String externalId;
-    private String pin;
     private String username;
     private Date activatedOn;
     private Boolean nonLocked;
@@ -47,6 +46,7 @@ public class Agent {
 
     public void validate(){
         userMeta.validate();
+        Validate.notNull(type,"Agent type is required");
         Validate.notNull(company,"Agent must belong to a company");
         Validate.notNull(username,"Username is required");
         Validate.notNull(termsAndConditions, "Terms of use is required");

@@ -4,10 +4,12 @@ import com.jajjamind.payvault.core.BaseApi;
 import com.jajjamind.payvault.core.api.account.models.Account;
 import com.jajjamind.payvault.core.api.account.models.AccountLink;
 import com.jajjamind.payvault.core.api.account.models.AccountingGroup;
+import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.repository.account.JooqAccountRepository;
 import com.jajjamind.payvault.core.service.account.AccountService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -39,6 +41,11 @@ public class AccountApi {
         return  accountService.getAccountById(id);
     }
 
+    @RolesAllowed({"ROLE_ACCOUNT.READ","ROLE_ACCOUNT.WRITE"})
+    @GetMapping(value = "/query",produces = BaseApi.APPLICATION_JSON)
+    public RecordList getAllAccounts(@RequestParam MultiValueMap map){
+        return  accountService.getAllAccounts(map);
+    }
 
     @RolesAllowed("ROLE_ACCOUNT.READ")
     @GetMapping(value = "/code/{code}",produces = BaseApi.APPLICATION_JSON)

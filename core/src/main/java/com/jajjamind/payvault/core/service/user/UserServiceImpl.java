@@ -1,5 +1,6 @@
 package com.jajjamind.payvault.core.service.user;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.agent.models.Country;
@@ -28,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,6 +144,22 @@ public class UserServiceImpl implements UserService {
         Validate.isTrue(toUser.isPresent(),ErrorMessageConstants.USER_WITH_ID_NOT_FOUND,id);
 
         return  getUserObjectFromTUser(toUser.get());
+    }
+
+    @Override
+    public User getByUserName(String username) {
+        TUser tUser = userRepository.findByUsernameWithMeta(username).orElseThrow(() -> new BadRequestException("User with username %s could not be found",username));
+        User user = new User();
+
+        BeanUtilsCustom.copyProperties(tUser,user);
+
+        if(tUser.getUserMeta() != null){
+            UserMeta meta = new UserMeta();
+            BeanUtilsCustom.copyProperties(tUser.getUserMeta(),meta);
+            user.setUserMeta(meta);
+        }
+
+        return user;
     }
 
     private User getUserObjectFromTUser(TUser tUser) {
