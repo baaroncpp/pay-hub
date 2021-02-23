@@ -7,6 +7,7 @@ import com.jajjamind.payvault.core.api.agent.models.Country;
 import com.jajjamind.payvault.core.api.agent.models.District;
 import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.exception.ServiceApiNotSupported;
+import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.jpa.models.agent.TCompany;
 import com.jajjamind.payvault.core.jpa.models.agent.TCountry;
 import com.jajjamind.payvault.core.jpa.models.agent.TDistrict;
@@ -14,15 +15,14 @@ import com.jajjamind.payvault.core.jpa.models.enums.CountryEnum;
 import com.jajjamind.payvault.core.repository.agent.CompanyRepository;
 import com.jajjamind.payvault.core.repository.agent.CountryRepository;
 import com.jajjamind.payvault.core.repository.agent.DistrictRepository;
+import com.jajjamind.payvault.core.repository.agent.JooqCompanyRepository;
 import com.jajjamind.payvault.core.utils.AuditService;
 import com.jajjamind.payvault.core.utils.BeanUtilsCustom;
 import com.jajjamind.payvault.core.utils.ValidateUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
-import javax.management.ServiceNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +46,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     public DistrictRepository districtRepository;
+
+    @Autowired
+    public JooqCompanyRepository jooqCompanyRepository;
 
     @Override
     public Company add(Company company) {
@@ -86,6 +89,10 @@ public class CompanyServiceImpl implements CompanyService {
         TCompany tCompany = companyRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(ErrorMessageConstants.COMPANY_WITH_ID_COULD_NOT_BE_FOUND,id));
 
+        return getCompanyFromTCompany(tCompany);
+    }
+
+    private Company getCompanyFromTCompany(TCompany tCompany){
         final Company company = new Company();
         BeanUtilsCustom.copyProperties(tCompany,company);
 
@@ -101,7 +108,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         return company;
     }
-
     @Override
     public Company update(Company company) {
 
@@ -141,8 +147,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll() {
+        throw new ServiceApiNotSupported("This API is not supported. Refer to /query endpoint of same");
 
-        Iterable<TCompany> companies = companyRepository.findAll();
+    /*    Iterable<TCompany> companies = companyRepository.findAll();
         List<Company> c = new ArrayList<>();
         companies.forEach(t -> {
             final Company company = new Company();
@@ -160,7 +167,26 @@ public class CompanyServiceImpl implements CompanyService {
             c.add(company);
         });
 
-        return c;
+        return c;*/
     }
 
+    @Override
+    public Company findByBusinessName(String businessName) {
+        final TCompany company = companyRepository.findByBusinessName(businessName).orElseThrow(() -> new BadRequestException("No company found with name %s",businessName));
+
+        return getCompanyFromTCompany(company);
+    }
+
+    @Override
+    public Company findByTinNumber(String tinNumber) {
+
+        final TCompany company = companyRepository.findByTinNumber(tinNumber).orElseThrow(() -> new BadRequestException("No company found with Tin Number %s",tinNumber));
+
+        return getCompanyFromTCompany(company);
+    }
+
+    @Override
+    public RecordList getAllCompanies(MultiValueMap map) {
+        return jooqCompanyRepository.listAndCount(map);
+    }
 }

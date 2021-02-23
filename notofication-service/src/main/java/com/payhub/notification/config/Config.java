@@ -34,10 +34,6 @@ public class Config {
         return new EmailService();
     }
 
-    @Bean
-    public SkylineAPIService getRetrofitSkylineService(){
-        return RetrofitSkylineService.getSkylineAPIService();
-    }
 
     @Bean
     public JavaMailSender getJavaMailSender() {

@@ -17,6 +17,7 @@ public class RecordList<T> {
 
     private Long recordsTotal;
     private int recordsFiltered;
+    private int offset;
     private List<T> records;
 
     public RecordList() {

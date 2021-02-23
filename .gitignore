@@ -27,7 +27,12 @@ gradle-app.setting
 **/data-bundles/out/**
 **/interswitch/out/**
 **/mobile-money/out/**
+**/notofication-service/out/**
 
 payvault-aggregators.iml
 payvault-aggregators.iws
 payvault-aggregators.ipr
+.gradle/*
+commons/.gradle/*
+core/.gradle/*
+deploy.sh

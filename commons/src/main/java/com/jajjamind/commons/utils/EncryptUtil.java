@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.system.SystemProperties;
 
 import java.util.Base64;
 
@@ -18,7 +19,7 @@ public abstract class EncryptUtil {
 	
 	private static final String AES_INIT_VECTOR = "RandomInitVector";
 	//Get this from per
-	private static final String AES_KEY = "NaphWagwan20399$";
+	private static final String AES_KEY = System.getProperty("AES_KEY","NaphWagwan20399$");
 
 	public static String encryptAES(String value) {
        

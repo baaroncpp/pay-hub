@@ -1,88 +1,106 @@
 package com.payhub.notification.service.imp;
 
-import com.jajjamind.commons.utils.UUIDUtil;
-import com.payhub.notification.constants.SmsDelivery;
-import com.payhub.notification.entities.SmsNotification;
-import com.payhub.notification.model.BalanceResponse;
-import com.payhub.notification.model.Notification;
-import com.payhub.notification.model.ReportResponse;
-import com.payhub.notification.model.SmsResponse;
+import com.jajjamind.commons.exceptions.BadRequestException;
+import com.jajjamind.commons.text.StringUtil;
+import com.jajjamind.commons.time.DateTimeUtil;
+import com.jajjamind.commons.utils.EncryptUtil;
+import com.jajjamind.commons.utils.RealTimeUtil;
+import com.jajjamind.commons.utils.configs.Provider;
+import com.jajjamind.commons.utils.configs.ProviderMap;
+import com.payhub.notification.constants.Status;
+import com.payhub.notification.entities.TSmsMessage;
+import com.payhub.notification.model.*;
 import com.payhub.notification.network.RetrofitSkylineService;
-import com.payhub.notification.network.SkylineAPIService;
-import com.payhub.notification.repository.SmsNotificationRepository;
+import com.payhub.notification.repository.SmsMessageRepository;
 import com.payhub.notification.service.EmailService;
 import com.payhub.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class NotificationServiceImp implements NotificationService {
 
     @Autowired
-    private SkylineAPIService skylineAPIService;
+    private RetrofitSkylineService skylineAPIService;
 
     @Autowired
     private EmailService emailService;
 
-    @Value("${skyline.sms.token}")
-    private String token;
-
-    @Value("${message.source.name}")
-    private String fromName;
-
-    private SmsNotificationRepository smsNotificationRepository;
-
     @Autowired
-    public NotificationServiceImp(SmsNotificationRepository smsNotificationRepository){
-        this.smsNotificationRepository = smsNotificationRepository;
-    }
+    private SmsMessageRepository smsMessageRepository;
+
+    private static final String FROM_NAME ="PayHub";
+
 
     @Override
-    public SmsResponse sendSms(Notification notification) {
+    public Optional<SmsResponse> sendSms(Notification notification, boolean withException) {
 
-        skylineAPIService = RetrofitSkylineService.getSkylineAPIService();
-        Call<SmsResponse> call = skylineAPIService.sendSms(token, notification.getAddress(), fromName, notification.getContent());
+        final String id = RealTimeUtil.generateTransactionId();
+        createSMSNotification(notification,id);
 
-        String url = call.request().url().toString();
+        Call<SmsResponse> call = skylineAPIService.getSkylineAPIService().sendSms(skylineAPIService.getSkylineToken(), notification.getAddress(), FROM_NAME, notification.getContent());
 
         Response<SmsResponse> response = null;
+
         try {
             response = call.execute();
         } catch (IOException e) {
             e.printStackTrace();
-        }
 
-        SmsNotification smsNotification = new SmsNotification();
-
-        if(response.isSuccessful()){
-            smsNotification.setNotificationType(notification.getNotificationType());
-            smsNotification.setId(UUIDUtil.getUUID());
-            smsNotification.setMessage(notification.getContent());
-            smsNotification.setReference(response.body().getReference());
-            smsNotification.setCreatedOn(new Date());
-
-            if(response.body().getStatus().equals("Failed")){
-                smsNotification.setSmsDelivery(SmsDelivery.FAILED);
-            }else{
-                smsNotification.setSmsDelivery(SmsDelivery.UNKNOWN);
+            if(withException) {
+                throw new BadRequestException("Failed to send request to SMS Gateway");
             }
-            smsNotification.setStatus(response.body().getStatus());
 
-            smsNotificationRepository.save(smsNotification);
-
-            return response.body();
-        }else {
-         throw new RuntimeException("Failed to access SkyLine");
+            return Optional.empty();
         }
+
+        SmsResponse body = response.body();
+        updateSMSNotification(id,body);
+
+        return Optional.of(body);
+    }
+
+    private void createSMSNotification(Notification notification,String id){
+       final TSmsMessage smsNotification = new TSmsMessage();
+
+        smsNotification.setId(id);
+        smsNotification.setContent(StringUtil.isEmpty(notification.getMaskedContent()) ? notification.getContent() : notification.getMaskedContent());
+        smsNotification.setCreatedOn(DateTimeUtil.getCurrentUTCTime());
+        smsNotification.setStatus(Status.PENDING);
+        smsNotification.setStatusDescription("Message has no known state yet");
+        smsNotification.setProvider(notification.getProvider().name());
+        smsNotification.setRecipient(notification.getAddress());
+
+        smsMessageRepository.save(smsNotification);
+    }
+
+    private void updateSMSNotification(String id,SmsResponse response){
+
+        Optional<TSmsMessage> message = smsMessageRepository.findById(id);
+        if(message.isPresent()){
+
+            TSmsMessage toUpdate = message.get();
+            toUpdate.setReference(response.getReference());
+
+            if(response.getStatus().equalsIgnoreCase("failed")) {
+                toUpdate.setStatus(Status.FAILED);
+            }else if(response.getStatus().equalsIgnoreCase("success")){
+                toUpdate.setStatus(Status.SUCCESS);
+            }else{
+                toUpdate.setStatus(Status.UNKNOWN);
+            }
+            toUpdate.setModifiedOn(DateTimeUtil.getCurrentUTCTime());
+
+            smsMessageRepository.save(toUpdate);
+
+        }
+
     }
 
     @Override
@@ -96,15 +114,11 @@ public class NotificationServiceImp implements NotificationService {
     }
 
     @Override
-    public ReportResponse getDeliveryReport(String reference) {
+    public ReportResponse getDeliveryReport(String id) {
 
-        Optional<SmsNotification> smsNotification = smsNotificationRepository.findByReference(reference);
-        if(smsNotification.isEmpty()){
-            throw new RuntimeException("SmsNotification not found");
-        }
+        TSmsMessage smsNotification = smsMessageRepository.findById(id).orElseThrow(() -> new BadRequestException("Sms message could not be found"));
 
-        skylineAPIService = RetrofitSkylineService.getSkylineAPIService();
-        Call<ReportResponse> call = skylineAPIService.deliveryReports(token, reference);
+        Call<ReportResponse> call = skylineAPIService.getSkylineAPIService().deliveryReports(skylineAPIService.getSkylineToken(), smsNotification.getReference());
 
         Response<ReportResponse> response = null;
         try {
@@ -112,49 +126,35 @@ public class NotificationServiceImp implements NotificationService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         ReportResponse reportResponse = response.body();
 
         if(response.isSuccessful()){
 
             if(response.body().getDelivery().equals("Delivered")){
-                smsNotification.get().setStatus("Delivered");
-                smsNotification.get().setSmsDelivery(SmsDelivery.SUCCESS);
-                smsNotificationRepository.save(smsNotification.get());
+               smsNotification.setDelivered(Boolean.TRUE);
+               smsNotification.setModifiedOn(DateTimeUtil.getCurrentUTCTime());
+               smsMessageRepository.save(smsNotification);
             }
             return reportResponse;
         }else{
-            throw new RuntimeException("Failed to access SkyLine");
+            throw new BadRequestException("Failed to access SkyLine");
         }
     }
 
     @Override
     public BalanceResponse getBalance(){
 
-        skylineAPIService = RetrofitSkylineService.getSkylineAPIService();
-        Call<BalanceResponse> call = skylineAPIService.checkBalance(token);
+        Call<BalanceResponse> call = skylineAPIService.getSkylineAPIService().checkBalance(skylineAPIService.getSkylineToken());
 
         Response<BalanceResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new BadRequestException("Failed to retrieve balance");
         }
-        BalanceResponse balanceResponse = response.body();
 
-        return balanceResponse;
-    }
+        return response.body();
 
-    @Override
-    public SmsNotification getSmsNotification(String id) {
-        Optional<SmsNotification> smsNotification = smsNotificationRepository.findById(id);
-        if(smsNotification.isEmpty()){
-            throw new RuntimeException("SmsNotification not found");
-        }
-        return smsNotification.get();
-    }
-
-    @Override
-    public List<SmsNotification> getSmsNotifications(int size, int page) {
-        return null;
     }
 }

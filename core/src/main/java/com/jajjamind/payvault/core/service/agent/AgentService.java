@@ -2,10 +2,15 @@ package com.jajjamind.payvault.core.service.agent;
 
 import com.jajjamind.payvault.core.api.agent.models.Agent;
 
+import com.jajjamind.payvault.core.api.users.models.Approval;
+import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
+import com.jajjamind.payvault.core.jpa.models.enums.ApprovalEnum;
 import com.jajjamind.payvault.core.repository.agent.JooqAgentRepository;
 import com.jajjamind.payvault.core.service.BaseApiService;
 import org.springframework.util.MultiValueMap;
+
+import java.util.List;
 
 /**
  * @author akena
@@ -15,6 +20,10 @@ import org.springframework.util.MultiValueMap;
 public interface AgentService extends BaseApiService<Agent> {
 
     RecordList<JooqAgentRepository.Result> queryForAgents(MultiValueMap<String,?> k);
-    void approveOrRejectAgentCreation(Long agentId,String status,String comment);
-
+    void approveOrRejectAgentCreation(Approval approval);
+    boolean isUserNameTaken(String username);
+    Agent addSuperAgent(Agent agent);
+    List<Agent> getSuperAgents();
+    RecordList getAgentsPendingApproval(MultiValueMap map);
+    TermsAndConditions getTermsOfService();
 }

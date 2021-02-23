@@ -35,8 +35,9 @@ public class TAgent extends AuditedEntity {
     private TAgent enrolledBy;
     private LocalDateTime reactivatedOn;
     private ApprovalEnum approvalStatus;
+    private Boolean initialPasswordReset;
 
-    @JoinColumn(name = "id",referencedColumnName = "agent_id",insertable = false,updatable = false)
+    @JoinColumn(name = "id",referencedColumnName = "agent_id",insertable = true,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TUserMeta getUserMeta() {
         return userMeta;
@@ -56,7 +57,7 @@ public class TAgent extends AuditedEntity {
         this.type = type;
     }
 
-    @JoinColumn(name = "approved_by",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "approved_by",referencedColumnName = "id",insertable = false,updatable = true)
     @OneToOne(fetch = FetchType.LAZY)
     public TUser getApprovedBy() {
         return approvedBy;
@@ -147,7 +148,7 @@ public class TAgent extends AuditedEntity {
         this.lastPinLockReason = lastPinLockReason;
     }
 
-    @JoinColumn(name = "terms_and_conditions",referencedColumnName = "id",insertable = false,updatable = false)
+    @JoinColumn(name = "terms_and_conditions",referencedColumnName = "id",insertable = true,updatable = false)
     @OneToOne(fetch = FetchType.LAZY)
     public TTermsAndConditions getTermsAndConditions() {
         return termsAndConditions;
@@ -195,5 +196,14 @@ public class TAgent extends AuditedEntity {
 
     public void setApprovalStatus(ApprovalEnum approvalStatus) {
         this.approvalStatus = approvalStatus;
+    }
+
+    @Column(name = "initial_password_reset")
+    public Boolean getInitialPasswordReset() {
+        return initialPasswordReset;
+    }
+
+    public void setInitialPasswordReset(Boolean initialPasswordReset) {
+        this.initialPasswordReset = initialPasswordReset;
     }
 }

@@ -2,6 +2,8 @@ package com.jajjamind.payvault.core.api.agent;
 
 import com.jajjamind.payvault.core.BaseApi;
 import com.jajjamind.payvault.core.api.agent.models.Agent;
+import com.jajjamind.payvault.core.api.users.models.Approval;
+import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.jpa.models.RecordList;
 import com.jajjamind.payvault.core.repository.agent.JooqAgentRepository;
 import com.jajjamind.payvault.core.service.agent.AgentService;
@@ -60,11 +62,38 @@ public class AgentApi implements BaseApi<Agent> {
      * requiredColumns
      */
 
+    @GetMapping("/super")
+    public List<Agent> getSuperAgents(){
+        return agentService.getSuperAgents();
+    }
+
     @GetMapping(value = "/query",produces = APPLICATION_JSON)
     public RecordList<JooqAgentRepository.Result> queryForAgent(
             @RequestParam MultiValueMap<String,?> requestParams
             ){
         return agentService.queryForAgents(requestParams);
+    }
+
+    @GetMapping(value = "/{username}/check")
+    public boolean checkIfAgentUserNameIsTaken(@PathVariable("username") String username){
+        return agentService.isUserNameTaken(username);
+    }
+
+    @PostMapping("approve")
+    public void approveAgent(@RequestBody Approval approval){
+        agentService.approveOrRejectAgentCreation(approval);
+    }
+
+
+    @GetMapping("/approve/pending")
+    public RecordList getAgentsPendingApproval(@RequestParam MultiValueMap map){
+
+        return agentService.getAgentsPendingApproval(map);
+    }
+
+    @GetMapping("/termsofuse")
+    public TermsAndConditions getTermsOfUse(){
+        return agentService.getTermsOfService();
     }
 
 }
