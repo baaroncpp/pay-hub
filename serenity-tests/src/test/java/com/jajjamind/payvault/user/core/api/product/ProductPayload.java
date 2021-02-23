@@ -1,15 +1,11 @@
 package com.jajjamind.payvault.user.core.api.product;
 
 import com.github.javafaker.Faker;
-import com.jajjamind.payvault.core.api.account.models.Account;
-import com.jajjamind.payvault.core.jpa.models.enums.PricingTypeEnum;
-import com.jajjamind.payvault.core.jpa.models.enums.ProductCategoryEnum;
 import com.jajjamind.payvault.core.jpa.models.enums.StatusEnum;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author akena

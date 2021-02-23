@@ -1,5 +1,6 @@
 package com.jajjamind.commons.utils;
 
+import com.jajjamind.commons.time.DateTimeUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,6 +9,7 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Random;
 
 public class RealTimeUtil {
 	private static final Logger DEBUGLOG;
@@ -76,6 +78,21 @@ public class RealTimeUtil {
 		}
 		RealTimeUtil.DEBUGLOG.debug("DFT_OPER_FUNC_EXITExit method formatTransactionId");
 		return id;
+	}
+
+	public static String getFourDigitPasscode() {
+		final int fromDigits = 1111;
+		final int toDigits = 9999;
+
+		Random randGenerator = new Random(System.currentTimeMillis());
+		return String.valueOf(randGenerator.ints(fromDigits,toDigits));
+
+	}
+
+	public static String externalId(String MSISDN) {
+		final String mdate = DateTimeUtil.dateToString(DateTimeUtil.getCurrentUTCTime(),DateTimeUtil.YYYYMMDDHHMMSS);
+		return mdate.substring(2, mdate.length()) +
+				MSISDN.substring(4, MSISDN.length());
 	}
 
 	static {

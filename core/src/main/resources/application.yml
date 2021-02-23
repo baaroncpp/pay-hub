@@ -26,6 +26,18 @@ spring:
       ignoreFutureMigrations: true
       defaultSchema: core
 
+   mail:
+     host: mail.payvaultug.com
+     port: 465
+     username: dummy
+     password: dummy
+     properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 payvault:
     enviroment: ${PV_ENV}
 

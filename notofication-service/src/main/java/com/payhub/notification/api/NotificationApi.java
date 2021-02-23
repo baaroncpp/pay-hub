@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class NotificationApi {
@@ -14,8 +15,8 @@ public class NotificationApi {
     @Autowired
     private NotificationService notificationService;
 
-    public SmsResponse sendSms(Notification notification) throws IOException {
-        return notificationService.sendSms(notification);
+    public Optional<SmsResponse> sendSms(Notification notification,boolean withException) {
+        return notificationService.sendSms(notification,withException);
     }
 
     public void sendEmail(Notification notification) throws MessagingException {
