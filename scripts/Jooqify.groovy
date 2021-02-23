@@ -17,25 +17,8 @@ import java.awt.datatransfer.StringSelection
 class Jooqify {
 
     def query = '''
-                    SELECT
-                        td.id AS id_bigint,
-                        tr.id AS 'request.id_bigint',
-                        maw.id AS 'wallet.awamoWalletId_bigint',
-                        mtw.id AS 'wallet.walletId_bigint',
-                        mtw.account_no AS accountNumber_string,
-                        td.amount AS amount_decimal,
-                        tr.amount AS 'request.amount_decimal',
-                        tr.tx_type  AS 'request.type_string',
-                        td.tx_type  AS 'detail.type_string',
-                        tr.tx_status  AS status
-                    FROM
-                        m_awamo_wallet maw
-                    INNER JOIN m_tenant_wallet mtw ON
-                        mtw.id = maw.wallet_id
-                    INNER JOIN w_wallet_transaction_request tr ON
-                        tr.wallet_id = mtw.id
-                    INNER JOIN m_wallet_transaction_detail td ON
-                        td.wallet_tx_request_id = tr.id
+                  SELECT t.name as name_string, t.las_name as lastName_string
+                   FROM core.t_user t;
                     '''.stripIndent()
 
     String[] args
@@ -363,7 +346,10 @@ class Jooqify {
                 }
 
                 codeBlock('public RecordList<Result> listAndCount(MultiValueMap<String,?> map)') {
-                    writeln 'return new RecordList<Result>(count(map),list(map));'
+                    writeln "final RecordList<Result> result  = new RecordList<Result>(count(map),list(map));"
+                    writeln "result.setOffset(map.containsKey(\"offset\") ? (int) map.getFirst(\"offset\") : null);"
+                    writeln "result.setRecordsFiltered(result.getRecords().size());"
+                    writeln "return result;"
                 }
 
                 codeBlock('public List<Result> list(MultiValueMap<String,?> map)') {
@@ -371,7 +357,11 @@ class Jooqify {
                 }
 
                 codeBlock('public Long count(MultiValueMap<String,?> map)') {
-                    writeln "return context.fetchOne(this.query(addCountParams(map))).getValue(0,Long.class);"
+                    writeln "Record result  = context.fetchOne(this.query(addCountParams(map)));"
+                    codeBlock("if(result != null)"){
+                        writeln "return result.get(0, Long.class);"
+                    }
+                    writeln "return 0L;"
                 }
 
                 codeBlock('public String getAllFields()'){
