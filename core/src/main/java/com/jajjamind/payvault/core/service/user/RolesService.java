@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.service.user;
 
 import com.jajjamind.payvault.core.api.users.models.Group;
 import com.jajjamind.payvault.core.api.users.models.Role;
+import com.jajjamind.payvault.core.api.users.models.RolesAndGroups;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface RolesService {
     void assignUserToGroup(Integer group,Long userId);
     void unAssignUserFromGroup(Integer group, Long userId);
     List<Group> getAllGroups();
+    RolesAndGroups getUserRolesAndGroups(String username);
+
 }

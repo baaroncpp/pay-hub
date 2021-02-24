@@ -1,8 +1,11 @@
 package com.jajjamind.payvault.core.service.user;
 
+import com.jajjamind.commons.exceptions.BadRequestException;
 import com.jajjamind.commons.utils.Validate;
+import com.jajjamind.payvault.core.api.constants.ErrorMessageConstants;
 import com.jajjamind.payvault.core.api.users.models.Group;
 import com.jajjamind.payvault.core.api.users.models.Role;
+import com.jajjamind.payvault.core.api.users.models.RolesAndGroups;
 import com.jajjamind.payvault.core.jpa.models.user.*;
 import com.jajjamind.payvault.core.repository.security.UserRepository;
 import com.jajjamind.payvault.core.repository.user.*;
@@ -284,6 +287,46 @@ public class RolesServiceImpl implements RolesService{
 
         return group;
 
+    }
+
+    @Override
+    public RolesAndGroups getUserRolesAndGroups(String username) {
+        TUser user = userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException(ErrorMessageConstants.USER_WITH_ID_NOT_FOUND,username));
+        TUserAuthority role = userAuthorityRepository.findByUsername(username).orElse(null);
+
+        List<TGroupMember> gm = groupMemberRepository.findByUsername(username);
+
+        RolesAndGroups rd = new RolesAndGroups();
+        List<Role> roles = new ArrayList<>();
+
+        if(!gm.isEmpty()){
+            List<Group> groups = new ArrayList<>();
+            groupRepository.findAllGroupsById( gm.stream().map(TGroupMember::getGroupId).toArray(Integer[]::new))
+            .forEach(t -> {
+                Group g = new Group();
+                g.setId(t.getId());
+                g.setName(t.getName());
+                g.setNote(t.getNote());
+                groups.add(g);
+            });
+
+            rd.setGroups(groups);
+        }
+
+
+        if(role != null){
+            Arrays.stream(role.getAuthority().split(",")).forEach(t ->{
+                        Role r = new Role();
+                        r.setName(t);
+                        roles.add(r);
+                    }
+            );
+
+            rd.setRoles(roles);
+        }
+
+
+        return rd;
     }
 
     private void validateUserDetailsForRoleAssignment(TUser user){
