@@ -100,7 +100,7 @@ public class AgentServiceImpl implements AgentService{
     public Agent add(Agent agent) {
 
         agent.validate();
-        Validate.isTrue(agent.getType().equals(AgentTypeEnum.SUPER_AGENT),"Agent is not a ordinary agent");
+        Validate.isTrue(agent.getType().equals(AgentTypeEnum.ORDINARY_AGENT),"Agent is not a ordinary agent");
 
         return addAgent(agent);
 
