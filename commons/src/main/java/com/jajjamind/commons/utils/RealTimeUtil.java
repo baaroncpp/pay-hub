@@ -85,7 +85,7 @@ public class RealTimeUtil {
 		final int toDigits = 9999;
 
 		Random randGenerator = new Random(System.currentTimeMillis());
-		return String.valueOf(randGenerator.ints(fromDigits,toDigits));
+		return String.valueOf(randGenerator.nextInt(toDigits)+fromDigits);
 
 	}
 

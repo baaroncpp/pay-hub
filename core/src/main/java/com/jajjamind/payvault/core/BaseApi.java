@@ -28,7 +28,7 @@ public interface BaseApi<T> {
     T update(T t);
 
     @DeleteMapping(path="/{id}",produces = APPLICATION_JSON)
-    T delete(long id);
+    T delete(@PathVariable("id") Long id);
 
     @GetMapping(path="/all", produces = APPLICATION_JSON)
     List<T> getAll();
