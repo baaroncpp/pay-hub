@@ -1,0 +1,1 @@
+ALTER TABLE core.t_sms_messages ADD COLUMN reference VARCHAR(32);
