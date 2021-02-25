@@ -4,6 +4,7 @@ import com.jajjamind.payvault.core.jpa.models.BaseEntityLong;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author akena
@@ -16,7 +17,7 @@ public class TAgentPreviousPin extends BaseEntityLong {
 
     private TAgent agent;
     private String pin;
-    private LocalDateTime removalTime;
+    private Date removalTime;
     private String note;
 
     @JoinColumn(name = "agent_id",referencedColumnName = "id",insertable = false,updatable = false)
@@ -39,11 +40,11 @@ public class TAgentPreviousPin extends BaseEntityLong {
     }
 
     @Column(name = "removal_time")
-    public LocalDateTime getRemovalTime() {
+    public Date getRemovalTime() {
         return removalTime;
     }
 
-    public void setRemovalTime(LocalDateTime removalTime) {
+    public void setRemovalTime(Date removalTime) {
         this.removalTime = removalTime;
     }
 

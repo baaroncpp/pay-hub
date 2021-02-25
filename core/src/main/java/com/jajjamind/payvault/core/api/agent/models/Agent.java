@@ -1,7 +1,9 @@
 package com.jajjamind.payvault.core.api.agent.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.jajjamind.commons.time.DateTimeUtil;
 import com.jajjamind.commons.utils.Validate;
 import com.jajjamind.payvault.core.api.users.models.TermsAndConditions;
 import com.jajjamind.payvault.core.api.users.models.UserMeta;
@@ -39,7 +41,9 @@ public class Agent {
     private Date reactivatedOn;
     private StatusEnum status;
     private ApprovalEnum approvalStatus;
+    @JsonFormat(pattern = DateTimeUtil.DD_MM_YYYY)
     private Date createdOn;
+    @JsonFormat(pattern = DateTimeUtil.DD_MM_YYYY)
     private Date modifiedOn;
     private String createdBy;
     private String modifiedBy;

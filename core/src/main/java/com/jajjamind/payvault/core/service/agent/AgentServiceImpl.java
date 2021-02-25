@@ -73,14 +73,109 @@ public class AgentServiceImpl implements AgentService{
     @Autowired
     public TermsAndConditionsRepository termsAndConditionsRepository;
 
+    @Autowired
+    public AgentPreviousPinRepository agentPreviousPinRepository;
+
 
     @Autowired
     public SmsService smsService;
+
 
     @Override
     public boolean isUserNameTaken(String username) {
         return agentRepository.checkThatUsernameIsNotTaken(username);
     }
+
+    @Override
+    public Agent getCurrentLoggedInAgent(String agentExternalId) {
+
+        TAgent agent = validateRequestAgentMatchesLoggedInAgent(agentExternalId);
+
+        Agent a = new Agent();
+        BeanUtilsCustom.copyProperties(agent,a);
+
+        UserMeta userMeta = new UserMeta();
+        BeanUtilsCustom.copyProperties(agent.getUserMeta(),userMeta);
+
+        Company company = new Company();
+        BeanUtilsCustom.copyProperties(agent.getCompany(),company);
+
+        a.setUserMeta(userMeta);
+        a.setCompany(company);
+
+        return a;
+    }
+
+    @Transactional
+    @Override
+    public void resetAgentPassword(String externalId, String oldPassword, String newPassword) {
+
+        Validate.isTrue(newPassword.length() == 4,"Pin length must be 4 in length");
+        TAgent agent = validateRequestAgentMatchesLoggedInAgent(externalId);
+        Validate.isTrue(agent.getNonLockedPin(),"Your PIN has been blocked, please contact administrator");
+        Validate.isTrue(passwordEncoder.matches(oldPassword,newPassword),"Password reset failed, old password is incorrect");
+
+        if(!agent.getInitialPasswordReset()){
+
+            String allowedDifferenceString = System.getProperty("agent.password.reset.delay","86400000");
+
+            Integer allowedDifference = null;
+            try{
+                allowedDifference = Integer.valueOf(allowedDifferenceString);
+            }catch (ClassCastException ex){
+                ex.printStackTrace();
+                allowedDifference = 86400000;
+            }
+
+            Long now =DateTimeUtil.getCurrentUTCTime().getTime();
+            Long then = agent.getPinLastedUpdatedOn() == null ? agent.getCreatedOn().getTime() : agent.getPinLastedUpdatedOn().getTime();
+
+
+            if(now - then > allowedDifference){
+
+                agent.setNonLockedPin(Boolean.FALSE);
+                agent.setNonDisabled(Boolean.FALSE);
+
+                agent.setModifiedOn(DateTimeUtil.getCurrentUTCTime());
+
+                agentRepository.save(agent);
+
+                Validate.isTrue(Boolean.FALSE,"The time required to reset pin has expired, please contact support");
+
+            }
+
+        }
+
+        final String passwordReset = agent.getPin();
+        agent.setInitialPasswordReset(Boolean.TRUE);
+        agent.setPinLastedUpdatedOn(DateTimeUtil.getCurrentUTCTime());
+        agent.setPin(passwordEncoder.encode(newPassword));
+
+        agent.setModifiedOn(DateTimeUtil.getCurrentUTCTime());
+
+        agentRepository.save(agent);
+
+        TAgentPreviousPin previousPin = new TAgentPreviousPin();
+        previousPin.setAgent(agent);
+        previousPin.setNote("Password reset by agent");
+        previousPin.setRemovalTime(DateTimeUtil.getCurrentUTCTime());
+        previousPin.setPin(passwordReset);
+        auditService.stampLongEntity(previousPin);
+
+        agentPreviousPinRepository.save(previousPin);
+
+    }
+
+    private TAgent validateRequestAgentMatchesLoggedInAgent(String agentExternalId){
+        LoggedInUser user = auditService.getLoggedInUser();
+
+        TAgent agent = agentRepository.findAgentWithAllDetails(user.getId()).orElseThrow(() -> new BadRequestException("Failed to retrieve agent details, logged in ID does not match system id"));
+
+        Validate.isTrue(agentExternalId.equalsIgnoreCase(agent.getExternalId()),"Agent data mismatch. Please contact administrator");
+
+        return agent;
+    }
+
 
     @Override
     public Agent addSuperAgent(Agent agent) {
@@ -92,7 +187,19 @@ public class AgentServiceImpl implements AgentService{
 
     @Override
     public List<Agent> getSuperAgents() {
-        return null;
+
+        List<TAgent> sa = agentRepository.findSuperAgents();
+        List<Agent> superAgent = new ArrayList<>();
+
+        sa.forEach(t -> {
+            Agent k = new Agent();
+            UserMeta meta = new UserMeta();
+            BeanUtilsCustom.copyProperties(t.getUserMeta(),meta);
+            BeanUtilsCustom.copyProperties(t,k);
+            k.setUserMeta(meta);
+            superAgent.add(k);
+        });
+        return superAgent;
     }
 
     @Override
@@ -101,6 +208,15 @@ public class AgentServiceImpl implements AgentService{
 
         agent.validate();
         Validate.isTrue(agent.getType().equals(AgentTypeEnum.ORDINARY_AGENT),"Agent is not a ordinary agent");
+        Validate.notNull(agent.getEnrolledBy(),"The enrolling agent must be indicated");
+        Validate.notNull(agent.getEnrolledBy().getId(),"Agent Id of enrolling agent is missing");
+
+
+        TAgent enrollingAgent = agentRepository.findById(agent.getEnrolledBy().getId()).orElseThrow(() -> new BadRequestException("Enrolling agent with ID %s not found",agent.getEnrolledBy().getId()));
+        Validate.isTrue(enrollingAgent.getApprovalStatus().equals(ApprovalEnum.APPROVED),"Enrolling agent is not approved");
+        Validate.isTrue(enrollingAgent.getType().equals(AgentTypeEnum.SUPER_AGENT),"Enrolling agent is not a super agent");
+        Validate.isTrue(enrollingAgent.getNonLocked(),"Enrolling agent account has been locked");
+        Validate.isTrue(enrollingAgent.getNonDisabled(),"Enrolling agent account has been disabled");
 
         return addAgent(agent);
 
@@ -209,6 +325,7 @@ public class AgentServiceImpl implements AgentService{
         TAgentApproval approval = new TAgentApproval();
         approval.setStatus(ApprovalEnum.PENDING);
         approval.setAgent(agentId);
+        approval.setApprovalCount(0);
 
         auditService.stampAuditedEntity(approval);
 
@@ -284,8 +401,8 @@ public class AgentServiceImpl implements AgentService{
     @Override
     public void approveOrRejectAgentCreation(Approval mApproval) {
         final ApprovalEnum status = mApproval.getStatus();
-        Validate.isTrue(status.equals(ApprovalEnum.REJECTED) ||
-                mApproval.equals(ApprovalEnum.APPROVED),ErrorMessageConstants.APPROVAL_STATUS_UNKNOWN,status);
+        Validate.isTrue(!status.equals(ApprovalEnum.REJECTED) ||
+                !mApproval.equals(ApprovalEnum.APPROVED),ErrorMessageConstants.APPROVAL_STATUS_UNKNOWN,status);
 
         TAgentApproval approval = agentApprovalRepository.findByIdWithAgent(mApproval.getId())
             .orElseThrow(() -> new BadRequestException("No pending approval found with given ID"));
@@ -296,7 +413,7 @@ public class AgentServiceImpl implements AgentService{
 
         final TAgent agent = approval.getAgent();
 
-        Validate.isTrue(!agent.getApprovalStatus().equals(ApprovalEnum.PENDING),"Agent has been approved");
+        Validate.isTrue(agent.getApprovalStatus().equals(ApprovalEnum.PENDING),"Agent has been approved");
 
         final LoggedInUser user = auditService.getLoggedInUser();
         final TUser approvingUser = new TUser();
@@ -327,9 +444,13 @@ public class AgentServiceImpl implements AgentService{
             auditService.stampAuditedEntity(agent);
             agentRepository.save(agent);
 
-            final String smsMessage = smsService.getSMSFromTemplate(getSMSContent(agent.getUserMeta().getPhoneNumber(),passcode), Sms.Name.AGENT_REGISTERED);
-            final String smsMessageMasked =  smsService.getSMSFromTemplate(getSMSContent(agent.getUserMeta().getPhoneNumber(),Sms.MASK), Sms.Name.AGENT_REGISTERED);
-            smsService.sendSms(smsMessage,smsMessageMasked,agent.getUserMeta().getPhoneNumber(),Boolean.FALSE);
+            TUserMeta userMeta = userMetaRepository.findByAgentId(agent.getId()).orElseThrow(() -> new BadRequestException("Failed to retrieve agent additional details"));
+
+            final String smsMessage = smsService.getSMSFromTemplate(getSMSContent(userMeta.getPhoneNumber(),passcode), Sms.Name.AGENT_REGISTERED);
+            final String smsMessageMasked =  smsService.getSMSFromTemplate(getSMSContent(userMeta.getPhoneNumber(),Sms.MASK), Sms.Name.AGENT_REGISTERED);
+
+            //TODO This should be asynchronous
+            smsService.sendSms(smsMessage,smsMessageMasked,userMeta.getPhoneNumber(),Boolean.FALSE);
 
         }
 
@@ -346,7 +467,31 @@ public class AgentServiceImpl implements AgentService{
 
     }
 
-    private Map<String,String> getSMSContent(String msisdn,String pin){
+    @Override
+    public void regenerateAgentPassword(Long agentId) {
+       final TAgent agent = agentRepository.findById(agentId).orElseThrow(() -> new BadRequestException("Agent with ID %s not found in system",agentId));
+
+        agent.setInitialPasswordReset(Boolean.FALSE);
+        agent.setNonLockedPin(Boolean.TRUE);
+        agent.setNonDisabled(Boolean.TRUE);
+        agent.setPinLastedUpdatedOn(DateTimeUtil.getCurrentUTCTime());
+
+        final String passcode = RealTimeUtil.getFourDigitPasscode();
+        agent.setPin(encodeUserPin(passcode));
+
+        auditService.stampAuditedEntity(agent);
+
+        TUserMeta userMeta = userMetaRepository.findByAgentId(agent.getId()).orElseThrow(() -> new BadRequestException("Failed to retrieve agent additional details"));
+
+        final String smsMessage = smsService.getSMSFromTemplate(getSMSContent(userMeta.getPhoneNumber(),passcode), Sms.Name.PIN_RESET);
+        final String smsMessageMasked =  smsService.getSMSFromTemplate(getSMSContent(userMeta.getPhoneNumber(),Sms.MASK), Sms.Name.PIN_RESET);
+
+        //TODO This should be asynchronous
+        smsService.sendSms(smsMessage,smsMessageMasked,userMeta.getPhoneNumber(),Boolean.FALSE);
+
+    }
+
+    private Map<String,String> getSMSContent(String msisdn, String pin){
         final Map<String,String> placeHolders = new HashMap<>();
         placeHolders.put("MSISDN",msisdn);
         placeHolders.put("PIN",pin);

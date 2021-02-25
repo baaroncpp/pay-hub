@@ -22,34 +22,24 @@ import java.util.List;
 @Tag(name = "Agent",description = "Agent Management")
 @RestController
 @RequestMapping("/agent")
-public class AgentApi implements BaseApi<Agent> {
+public class AgentApi{
 
     @Autowired
     public AgentService agentService;
 
-    @Override
-    public Agent add(Agent agent) {
+    @PostMapping(value = "/ordinary",produces = BaseApi.APPLICATION_JSON)
+    public Agent addOrdinaryAgent(Agent agent) {
         return agentService.add(agent);
     }
 
-    @Override
-    public Agent get(Long id) {
-      throw new UnsupportedOperationException();
+    @PostMapping(value = "/super",produces = BaseApi.APPLICATION_JSON)
+    public Agent addSuperAgent(Agent agent) {
+        return agentService.addSuperAgent(agent);
     }
 
-    @Override
+    @PutMapping(value = "/",produces = BaseApi.APPLICATION_JSON)
     public Agent update(Agent agent) {
         return agentService.update(agent);
-    }
-
-    @Override
-    public Agent delete(long id) {
-        return null;
-    }
-
-    @Override
-    public List<Agent> getAll() {
-       throw new UnsupportedOperationException();
     }
 
     /**
@@ -62,12 +52,13 @@ public class AgentApi implements BaseApi<Agent> {
      * requiredColumns
      */
 
-    @GetMapping("/super")
+    @GetMapping("/super/all")
     public List<Agent> getSuperAgents(){
         return agentService.getSuperAgents();
     }
 
-    @GetMapping(value = "/query",produces = APPLICATION_JSON)
+
+    @GetMapping(value = "/query",produces = BaseApi.APPLICATION_JSON)
     public RecordList<JooqAgentRepository.Result> queryForAgent(
             @RequestParam MultiValueMap<String,?> requestParams
             ){
@@ -94,6 +85,11 @@ public class AgentApi implements BaseApi<Agent> {
     @GetMapping("/termsofuse")
     public TermsAndConditions getTermsOfUse(){
         return agentService.getTermsOfService();
+    }
+
+    @PostMapping("/{agentId}/pin/regenerate")
+    public void regenerateAgentPin(@PathVariable("agentId") Long agentId){
+        agentService.regenerateAgentPassword(agentId);
     }
 
 }
