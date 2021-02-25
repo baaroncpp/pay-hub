@@ -5,6 +5,7 @@ import com.jajjamind.payvault.core.api.Approve;
 import com.jajjamind.payvault.core.api.bank.models.Bank;
 import com.jajjamind.payvault.core.api.bank.models.BankDeposit;
 import com.jajjamind.payvault.core.api.users.models.Approval;
+import com.jajjamind.payvault.core.exception.ServiceApiNotSupported;
 import com.jajjamind.payvault.core.service.bank.BankDepositService;
 import com.jajjamind.payvault.core.service.bank.BankService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,8 +52,8 @@ public class BankApi implements BaseApi<Bank> {
     }
 
     @Override
-    public Bank delete(long id) {
-        throw new NotImplementedException();
+    public Bank delete(Long id) {
+        throw new ServiceApiNotSupported("Bank deletion is not supported");
     }
 
     @RolesAllowed({"ROLE_BANK.WRITE","ROLE_BANK.READ"})

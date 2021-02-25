@@ -51,7 +51,7 @@ public class UsersApi implements BaseApi<User> {
 
     @RolesAllowed("ROLE_USER.WRITE")
     @Override
-    public User delete(long id) {
+    public User delete(Long id) {
         return userService.delete(id);
     }
 

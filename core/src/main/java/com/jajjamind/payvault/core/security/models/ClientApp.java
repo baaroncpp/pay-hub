@@ -27,8 +27,11 @@ public class ClientApp implements ClientDetails {
     private Boolean isAutoApprove;
     private Integer refreshTokenValiditySeconds;
     private List<GrantedAuthority> authorities;
+    private Integer accessTokenValiditySeconds;
 
-
+    public void setAccessTokenValiditySeconds(Integer accessTokenValiditySeconds) {
+        this.accessTokenValiditySeconds = accessTokenValiditySeconds;
+    }
 
     @Override
     public String getClientId() {
@@ -77,7 +80,7 @@ public class ClientApp implements ClientDetails {
 
     @Override
     public Integer getAccessTokenValiditySeconds() {
-        return refreshTokenValiditySeconds;
+        return accessTokenValiditySeconds;
     }
 
     @Override

@@ -53,7 +53,7 @@ public class ProductApi implements BaseApi<Product> {
 
     @RolesAllowed("ROLE_PRODUCT.WRITE")
     @Override
-    public Product delete(long id) {
+    public Product delete(Long id) {
         throw new ServiceApiNotSupported("Product deletion is not implemented");
     }
 
