@@ -6,6 +6,8 @@ package com.jajjamind.payvault.core.filter.security;
  * 11:39
  **/
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Component("corsFilter")
 public class CorsFilter extends OncePerRequestFilter {
 
