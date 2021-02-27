@@ -127,4 +127,6 @@ public class TUser extends BaseEntityLong implements Serializable {
     public void setInitialPasswordReset(boolean initialPasswordReset) {
         this.initialPasswordReset = initialPasswordReset;
     }
+
+
 }

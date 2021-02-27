@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,4 +17,6 @@ public interface GroupMemberRepository extends CrudRepository<TGroupMember,Integ
 
     @Query("Select u from TGroupMember u where u.username = :username and u.groupId = :groupId")
     Optional<TGroupMember> findByUsernameAndGroup(@Param("username") String username,@Param("groupId") Integer groupId);
+
+    List<TGroupMember> findByUsername(@Param("username") String username);
 }

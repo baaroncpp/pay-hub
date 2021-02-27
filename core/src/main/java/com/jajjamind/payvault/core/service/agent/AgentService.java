@@ -26,4 +26,7 @@ public interface AgentService extends BaseApiService<Agent> {
     List<Agent> getSuperAgents();
     RecordList getAgentsPendingApproval(MultiValueMap map);
     TermsAndConditions getTermsOfService();
+    Agent getCurrentLoggedInAgent(String id);
+    void resetAgentPassword(String externalId,String oldPassword,String newPassword);
+    void regenerateAgentPassword(Long agentId);
 }

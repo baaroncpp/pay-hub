@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface AgentApprovalRepository extends CrudRepository<TAgentApproval,Long> {
 
-    @Query("Select u from TAgentApproval u inner join fetch u.agent left join fetch u.approver1 left join fetch u.approver2 where u.id = :id")
+    @Query("Select u from TAgentApproval u inner join fetch u.agent a left join fetch u.approver1 left join fetch u.approver2 where a.id = :id and u.status = 'PENDING'")
     Optional<TAgentApproval> findByIdWithAgent(@Param("id") Long id);
 }

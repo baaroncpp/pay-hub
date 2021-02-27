@@ -46,7 +46,7 @@ public class CompanyApi implements BaseApi<Company> {
     }
 
     @Override
-    public Company delete( long id) {
+    public Company delete( Long id) {
         return companyService.delete(id);
     }
 

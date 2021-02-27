@@ -2,6 +2,7 @@ package com.jajjamind.payvault.core.api.users;
 
 import com.jajjamind.payvault.core.api.users.models.Group;
 import com.jajjamind.payvault.core.api.users.models.Role;
+import com.jajjamind.payvault.core.api.users.models.RolesAndGroups;
 import com.jajjamind.payvault.core.service.user.RolesService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class RolesAndPermissionsApi {
     @GetMapping("/group/{name}")
     public Group getGroupByName(@PathVariable("name") String name){
         return rolesService.getGroupAuthorityByName(name);
+    }
+
+    @RolesAllowed("ROLE_PERMISSION.READ")
+    @GetMapping("/user/{username}")
+    public RolesAndGroups getUserRolesAndGroups(@PathVariable("username") String name){
+        return rolesService.getUserRolesAndGroups(name);
     }
 
     @PostMapping("/assign/{userId}/{roleName}")

@@ -7,7 +7,8 @@ import com.jajjamind.payvault.core.jpa.models.user.TUser;
 import com.jajjamind.payvault.core.jpa.models.user.TUserMeta;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
+
 
 /**
  * @author akena
@@ -23,17 +24,17 @@ public class TAgent extends AuditedEntity {
     private String externalId;
     private String pin;
     private String username;
-    private LocalDateTime activatedOn;
+    private Date activatedOn;
     private Boolean nonLocked;
     private Boolean nonDisabled;
     private Boolean nonLockedPin;
-    private LocalDateTime pinLastedUpdatedOn;
+    private Date pinLastedUpdatedOn;
     private String lastPinLockReason;
     private TTermsAndConditions termsAndConditions;
     private TCompany company;
     private TUserMeta userMeta;
     private TAgent enrolledBy;
-    private LocalDateTime reactivatedOn;
+    private Date reactivatedOn;
     private ApprovalEnum approvalStatus;
     private Boolean initialPasswordReset;
 
@@ -95,11 +96,11 @@ public class TAgent extends AuditedEntity {
     }
 
     @Column(name = "activated_on")
-    public LocalDateTime getActivatedOn() {
+    public Date getActivatedOn() {
         return activatedOn;
     }
 
-    public void setActivatedOn(LocalDateTime activatedOn) {
+    public void setActivatedOn(Date activatedOn) {
         this.activatedOn = activatedOn;
     }
 
@@ -131,11 +132,11 @@ public class TAgent extends AuditedEntity {
     }
 
     @Column(name = "pin_last_updated_on")
-    public LocalDateTime getPinLastedUpdatedOn() {
+    public Date getPinLastedUpdatedOn() {
         return pinLastedUpdatedOn;
     }
 
-    public void setPinLastedUpdatedOn(LocalDateTime pinLastedUpdatedOn) {
+    public void setPinLastedUpdatedOn(Date pinLastedUpdatedOn) {
         this.pinLastedUpdatedOn = pinLastedUpdatedOn;
     }
 
@@ -180,11 +181,11 @@ public class TAgent extends AuditedEntity {
     }
 
     @Column(name = "last_reactivated_on")
-    public LocalDateTime getReactivatedOn() {
+    public Date getReactivatedOn() {
         return reactivatedOn;
     }
 
-    public void setReactivatedOn(LocalDateTime reactivatedOn) {
+    public void setReactivatedOn(Date reactivatedOn) {
         this.reactivatedOn = reactivatedOn;
     }
 

@@ -52,6 +52,9 @@ public class ClientUserDetailsServiceImpl implements ClientDetailsService {
         details.setRegisteredRedirectUri(null);
         details.setScopes(SetUtils.getSetFromStringWithSeparator(appClient.getScope()));
         details.setAuthorities(AuthorityUtils.commaSeparatedStringToAuthorityList(appClient.getAuthorities()));
+        details.setRefreshTokenValiditySeconds(appClient.getTokenValidity()*4);
+        details.setAccessTokenValiditySeconds(appClient.getTokenValidity());
+
         return details;
 
     }

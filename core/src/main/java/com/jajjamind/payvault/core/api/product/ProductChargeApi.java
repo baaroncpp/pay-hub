@@ -41,7 +41,7 @@ public class ProductChargeApi implements BaseApi<Charge> {
     }
 
     @Override
-    public Charge delete(long id) {
+    public Charge delete(Long id) {
         return null;
     }
 

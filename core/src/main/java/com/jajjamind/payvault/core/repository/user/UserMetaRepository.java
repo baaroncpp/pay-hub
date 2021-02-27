@@ -23,7 +23,7 @@ public interface UserMetaRepository extends CrudRepository<TUserMeta,Long> {
     @Query("Select u from TUserMeta u inner join TUserApproval t on t.userId = u.userId and t.status = 'PENDING'")
     List<TUserMeta> findAllWithUsersPendingApproval();
 
-    Optional<TUserMeta> findByUserId(@Param("userId") Integer userId);
+    Optional<TUserMeta> findByUserId(@Param("userId") Long userId);
 
-    Optional<TUserMeta> findByAgentId(@Param("agentId") Integer agentId);
+    Optional<TUserMeta> findByAgentId(@Param("agentId") Long agentId);
 }

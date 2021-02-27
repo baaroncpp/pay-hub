@@ -11,7 +11,7 @@ import java.util.Date;
  * 13:38
  **/
 @Entity
-@Table(name = "t_sms_message",schema = "core")
+@Table(name = "t_sms_messages",schema = "core")
 public class TSmsMessage {
 
     private String id;
@@ -26,7 +26,7 @@ public class TSmsMessage {
     private Date modifiedOn;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     public String getId() {
         return id;
     }

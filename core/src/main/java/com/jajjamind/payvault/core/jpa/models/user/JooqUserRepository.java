@@ -233,6 +233,7 @@ public class JooqUserRepository implements QueryResultPicker{
 
     public RecordList<Result> listAndCount(MultiValueMap<String,?> map){
         final RecordList<Result> result  = new RecordList<Result>(count(map),list(map));
+        result.setOffset(map.containsKey("offset") ? Integer.valueOf((String)map.getFirst("offset")) : 0);
         result.setRecordsFiltered(result.getRecords().size());
         return result;
     }
@@ -242,10 +243,9 @@ public class JooqUserRepository implements QueryResultPicker{
     }
 
     public Long count(MultiValueMap<String,?> map){
-        Select<Record> q = this.query(addCountParams(map));
-        Record result  = context.fetchOne(q);
+        Record result  = context.fetchOne(this.query(addCountParams(map)));
         if(result != null) {
-            return context.fetchOne(q).get(0, Long.class);
+            return result.get(0, Long.class);
         }
         return 0L;
     }

@@ -22,6 +22,7 @@ public abstract class EncryptUtil {
 	private static final String AES_KEY = System.getProperty("AES_KEY","NaphWagwan20399$");
 
 	public static String encryptAES(String value) {
+	    Validate.notEmpty(value,"");
        
 		try {
             IvParameterSpec iv = new IvParameterSpec(AES_INIT_VECTOR.getBytes("UTF-8"));
@@ -47,6 +48,7 @@ public abstract class EncryptUtil {
    
 	public static String decryptAES(String encrypted) {
         try {
+            Validate.notEmpty(encrypted,"Cipher text cannot be null or empty");
             IvParameterSpec iv = new IvParameterSpec(AES_INIT_VECTOR.getBytes("UTF-8"));
             SecretKeySpec skeySpec = new SecretKeySpec(AES_KEY.getBytes("UTF-8"), "AES");
 
